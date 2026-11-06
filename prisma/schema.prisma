@@ -1,0 +1,307 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  owner
+  staff
+}
+
+enum ServiceMode {
+  shop_visit
+  home_pickup
+  on_site
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  in_progress
+  waiting_parts
+  waiting_customer
+  ready
+  completed
+  cancelled
+  rejected
+}
+
+enum BookingSource {
+  website
+  whatsapp
+  phone
+  walk_in
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
+enum MessageStatus {
+  new
+  read
+  replied
+  archived
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(191)
+  email            String    @unique @db.VarChar(191)
+  passwordHash     String    @map("password_hash") @db.VarChar(255)
+  role             Role      @default(staff)
+  twoFactorSecret  String?   @map("two_factor_secret") @db.VarChar(255)
+  lastLoginAt      DateTime? @map("last_login_at")
+  failedAttempts   Int       @default(0) @map("failed_attempts")
+  lockedUntil      DateTime? @map("locked_until")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  auditLogs        AuditLog[]
+
+  @@map("users")
+}
+
+model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(191)
+  mobile    String    @unique @db.VarChar(50)
+  email     String?   @db.VarChar(191)
+  address   String?   @db.Text
+  status    String    @default("active") @db.VarChar(50)
+  notes     String?   @db.Text
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  bookings  Booking[]
+
+  @@map("customers")
+}
+
+model Service {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(191)
+  slug            String    @unique @db.VarChar(191)
+  shortDesc       String    @map("short_desc") @db.VarChar(255)
+  fullDesc        String    @map("full_desc") @db.Text
+  icon            String    @default("Wrench") @db.VarChar(100)
+  image           String?   @db.VarChar(255)
+  priceMode       String    @default("quote") @map("price_mode") @db.VarChar(50) // "diagnosis", "starts_from", "quote"
+  priceText       String?   @map("price_text") @db.VarChar(100)
+  faqJson         String?   @map("faq_json") @db.Text
+  metaTitle       String?   @map("meta_title") @db.VarChar(255)
+  metaDescription String?   @map("meta_description") @db.VarChar(255)
+  sortOrder       Int       @default(0) @map("sort_order")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  bookings        Booking[]
+  reviews         Review[]
+
+  @@map("services")
+}
+
+model ServiceArea {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(191)
+  slug        String    @unique @db.VarChar(191)
+  pincodes    String    @db.VarChar(255)
+  description String?   @db.Text
+  isActive    Boolean   @default(true) @map("is_active")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  bookings    Booking[]
+
+  @@map("service_areas")
+}
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  bookingCode   String        @unique @map("booking_code") @db.VarChar(50)
+  customerId    Int           @map("customer_id")
+  serviceId     Int           @map("service_id")
+  areaId        Int?          @map("area_id")
+  deviceType    String        @map("device_type") @db.VarChar(50) // Laptop, Desktop, All-in-one, Other
+  brand         String?       @db.VarChar(100)
+  model         String?       @db.VarChar(100)
+  problem       String        @db.Text
+  address       String?       @db.Text
+  latitude      Float?
+  longitude     Float?
+  preferredDate DateTime?     @map("preferred_date") @db.Date
+  preferredSlot String?       @map("preferred_slot") @db.VarChar(50) // morning, afternoon, evening
+  serviceMode   ServiceMode   @default(shop_visit) @map("service_mode")
+  status        BookingStatus @default(pending)
+  source        BookingSource @default(website)
+  publicNote    String?       @map("public_note") @db.Text
+  internalNote  String?       @map("internal_note") @db.Text
+  quotedAmount  Decimal?      @map("quoted_amount") @db.Decimal(10, 2)
+  finalAmount   Decimal?      @map("final_amount") @db.Decimal(10, 2)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  service       Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  area          ServiceArea?  @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  statusHistory BookingStatusHistory[]
+  attachments   BookingAttachment[]
+  reviews       Review[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([customerId])
+  @@index([serviceId])
+  @@map("bookings")
+}
+
+model BookingStatusHistory {
+  id         Int           @id @default(autoincrement())
+  bookingId  Int           @map("booking_id")
+  fromStatus BookingStatus @map("from_status")
+  toStatus   BookingStatus @map("to_status")
+  changedBy  String        @map("changed_by") @db.VarChar(100)
+  note       String?       @db.Text
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  booking    Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_status_history")
+}
+
+model BookingAttachment {
+  id        Int      @id @default(autoincrement())
+  bookingId Int      @map("booking_id")
+  filePath  String   @map("file_path") @db.VarChar(255)
+  mimeType  String   @map("mime_type") @db.VarChar(100)
+  size      Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_attachments")
+}
+
+model Review {
+  id           Int          @id @default(autoincrement())
+  customerName String       @map("customer_name") @db.VarChar(191)
+  bookingId    Int?         @map("booking_id")
+  serviceId    Int?         @map("service_id")
+  rating       Int          @default(5)
+  comment      String       @db.Text
+  status       ReviewStatus @default(pending)
+  isFeatured   Boolean      @default(false) @map("is_featured")
+  ownerReply   String?      @map("owner_reply") @db.Text
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  booking      Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  service      Service?     @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([isFeatured])
+  @@map("reviews")
+}
+
+model GalleryImage {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(191)
+  altText   String?  @map("alt_text") @db.VarChar(255)
+  category  String   @default("Workshop") @db.VarChar(50) // Laptop, Desktop, Workshop, Before/After
+  filePath  String   @map("file_path") @db.VarChar(255)
+  webpPath  String?  @map("webp_path") @db.VarChar(255)
+  sortOrder Int      @default(0) @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("gallery_images")
+}
+
+model ContactMessage {
+  id        Int           @id @default(autoincrement())
+  name      String        @db.VarChar(191)
+  mobile    String        @db.VarChar(50)
+  email     String?       @db.VarChar(191)
+  message   String        @db.Text
+  status    MessageStatus @default(new)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@map("contact_messages")
+}
+
+model AvailabilityRule {
+  id           Int     @id @default(autoincrement())
+  weekday      Int     // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+  openTime     String  @map("open_time") @db.VarChar(10) // "09:00"
+  closeTime    String  @map("close_time") @db.VarChar(10) // "19:00"
+  slotCapacity Int     @default(5) @map("slot_capacity")
+  isClosed     Boolean @default(false) @map("is_closed")
+
+  @@unique([weekday])
+  @@map("availability_rules")
+}
+
+model Holiday {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @unique @db.Date
+  reason String?  @db.VarChar(255)
+
+  @@map("holidays")
+}
+
+model Setting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique @db.VarChar(100)
+  value String @db.Text
+
+  @@map("settings")
+}
+
+model CostCalculatorItem {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique @db.VarChar(100)
+  name            String   @db.VarChar(191)
+  category        String   @db.VarChar(100)
+  serviceSlug     String   @default("laptop-repair") @map("service_slug") @db.VarChar(100)
+  description     String   @db.Text
+  baseMin         Int      @map("base_min")
+  baseMax         Int      @map("base_max")
+  turnaround      String   @db.VarChar(100)
+  warranty        String   @db.VarChar(191)
+  icon            String   @default("Wrench") @db.VarChar(100)
+  tag             String?  @db.VarChar(100)
+  sortOrder       Int      @default(0) @map("sort_order")
+  isActive        Boolean  @default(true) @map("is_active")
+  tierOptionsJson String?  @map("tier_options_json") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("cost_calculator_items")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  action    String   @db.VarChar(100)
+  entity    String   @db.VarChar(100)
+  entityId  String?  @map("entity_id") @db.VarChar(100)
+  ip        String?  @db.VarChar(50)
+  details   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
