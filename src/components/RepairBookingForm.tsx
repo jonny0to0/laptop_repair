@@ -96,6 +96,24 @@ export default function RepairBookingForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
+
+    // Client-side quick validation for touch/mobile devices
+    if (!name.trim()) {
+      setFeedback({ text: 'Please enter your full name.', isError: true });
+      return;
+    }
+
+    const digitsOnly = mobile.replace(/\D/g, '');
+    if (digitsOnly.length < 10) {
+      setFeedback({ text: 'Please enter a valid 10-digit mobile number (e.g. 9876543210).', isError: true });
+      return;
+    }
+
+    if (serviceMode !== 'shop_visit' && !address.trim()) {
+      setFeedback({ text: 'Please provide your address for doorstep courier or on-site service.', isError: true });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -103,18 +121,18 @@ export default function RepairBookingForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          mobile,
-          email,
+          name: name.trim(),
+          mobile: mobile.trim(),
+          email: email.trim(),
           deviceType,
-          brand,
-          model,
-          problem,
+          brand: brand.trim(),
+          model: model.trim(),
+          problem: problem.trim(),
           serviceSlug,
           serviceMode,
           preferredDate,
           preferredSlot,
-          address,
+          address: address.trim(),
           areaSlug,
         }),
       });
@@ -123,6 +141,10 @@ export default function RepairBookingForm({
       if (!res.ok) {
         setFeedback({ text: data.error || 'Failed to submit repair booking', isError: true });
         setLoading(false);
+        const formElem = document.getElementById('booking-form');
+        if (formElem) {
+          formElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         return;
       }
 
@@ -134,6 +156,7 @@ export default function RepairBookingForm({
         serviceMode: data.booking.serviceMode,
       });
       setLoading(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setFeedback({ text: 'Network connection error. Please try again.', isError: true });
       setLoading(false);
@@ -279,7 +302,7 @@ export default function RepairBookingForm({
             <select
               value={deviceType}
               onChange={(e) => setDeviceType(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 font-medium focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             >
               <option value="Laptop">Laptop (Windows / Mac / Chromebook)</option>
               <option value="Desktop">Desktop PC (Gaming / Office / Workstation)</option>
@@ -296,7 +319,7 @@ export default function RepairBookingForm({
             <select
               value={serviceSlug}
               onChange={(e) => setServiceSlug(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 font-medium focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             >
               {services.length > 0 ? (
                 services.map((s) => (
@@ -327,7 +350,7 @@ export default function RepairBookingForm({
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder="e.g. Dell, Apple, HP, Lenovo, Asus"
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             />
           </div>
 
@@ -340,7 +363,7 @@ export default function RepairBookingForm({
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder="e.g. Inspiron 15 3511, MacBook Pro M1 14''"
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             />
           </div>
         </div>
@@ -356,7 +379,7 @@ export default function RepairBookingForm({
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             placeholder="Describe what happened (e.g. screen flickers when moved, no power after thunderstorm, coffee spill on keyboard)..."
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20"
           />
         </div>
 
@@ -432,7 +455,7 @@ export default function RepairBookingForm({
               type="date"
               value={preferredDate}
               onChange={(e) => setPreferredDate(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             />
           </div>
 
@@ -443,7 +466,7 @@ export default function RepairBookingForm({
             <select
               value={preferredSlot}
               onChange={(e) => setPreferredSlot(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
             >
               <option value="morning">Morning (9:00 AM - 1:00 PM)</option>
               <option value="afternoon">Afternoon (1:00 PM - 5:00 PM)</option>
@@ -466,7 +489,7 @@ export default function RepairBookingForm({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Ramesh Kumar"
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
               />
             </div>
 
@@ -480,7 +503,7 @@ export default function RepairBookingForm({
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 placeholder="e.g. +91 98765 43210"
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
               />
             </div>
 
@@ -493,7 +516,7 @@ export default function RepairBookingForm({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="e.g. ramesh@example.com"
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
               />
             </div>
           </div>
@@ -512,7 +535,7 @@ export default function RepairBookingForm({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Flat / House No., Street, Landmark"
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
               />
             </div>
 
@@ -523,7 +546,7 @@ export default function RepairBookingForm({
               <select
                 value={areaSlug}
                 onChange={(e) => setAreaSlug(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-[#155EEF] focus:ring-2 focus:ring-[#155EEF]/20 tap-target"
               >
                 <option value="">Select Service Area / Pincode</option>
                 {serviceAreas.map((area) => (
@@ -536,6 +559,14 @@ export default function RepairBookingForm({
           </div>
         )}
 
+        {/* Inline Mobile-Friendly Feedback Alert above CTA */}
+        {feedback?.isError && (
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in shake">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <span>{feedback.text}</span>
+          </div>
+        )}
+
         {/* Submit Primary CTA Button using #155EEF */}
         <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs text-slate-500">
@@ -545,7 +576,7 @@ export default function RepairBookingForm({
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3996] transition-all shadow-md shadow-[#155EEF]/20 disabled:opacity-60 tap-target cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3996] transition-all shadow-md shadow-[#155EEF]/20 disabled:opacity-60 tap-target cursor-pointer touch-manipulation"
           >
             {loading ? (
               <>

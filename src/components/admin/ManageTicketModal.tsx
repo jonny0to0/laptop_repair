@@ -204,26 +204,26 @@ export default function ManageTicketModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center overscroll-contain animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-black/50 dark:bg-black/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center overscroll-contain animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-left overflow-hidden my-4 sm:my-8"
+        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl text-left overflow-hidden my-4 sm:my-8 transition-colors duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="sticky top-0 z-20 bg-slate-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between transition-colors duration-150">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+              <span className="text-xs font-mono font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-500/20">
                 {activeBooking.bookingCode}
               </span>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Created on {new Date(activeBooking.createdAt).toLocaleString('en-IN')}
               </span>
             </div>
-            <h2 className="text-lg font-bold text-white mt-1">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
               Manage Repair Ticket • {activeBooking.customer.name}
             </h2>
           </div>
@@ -231,7 +231,7 @@ export default function ManageTicketModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-colors"
             title="Close (Esc)"
           >
             <X className="w-5 h-5" />
@@ -243,18 +243,18 @@ export default function ManageTicketModal({
           {/* LEFT COLUMN: TICKET DETAILS (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
             {/* Customer Box */}
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-sky-400" />
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors duration-150">
+              <div className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>Customer Information</span>
               </div>
-              <div className="text-sm font-bold text-white">{activeBooking.customer.name}</div>
-              <div className="text-xs font-mono text-slate-300 flex items-center justify-between">
+              <div className="text-sm font-bold text-slate-900 dark:text-white">{activeBooking.customer.name}</div>
+              <div className="text-xs font-mono text-slate-700 dark:text-slate-300 flex items-center justify-between">
                 <span>{activeBooking.customer.mobile}</span>
                 <div className="flex items-center gap-2">
                   <a
                     href={`tel:${activeBooking.customer.mobile}`}
-                    className="px-2 py-1 rounded bg-slate-800 text-sky-400 hover:bg-slate-700 text-[10px] font-sans font-semibold"
+                    className="px-2.5 py-1 min-h-[28px] rounded-lg bg-slate-200 text-sky-800 hover:bg-slate-300 dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-slate-700 text-xs font-sans font-semibold transition-colors flex items-center justify-center"
                   >
                     Call
                   </a>
@@ -262,68 +262,68 @@ export default function ManageTicketModal({
                     href={`https://wa.me/${activeBooking.customer.mobile.replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-emerald-950 text-emerald-400 hover:bg-emerald-900 text-[10px] font-sans font-semibold"
+                    className="px-2.5 py-1 min-h-[28px] rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:hover:bg-emerald-900 text-xs font-sans font-semibold transition-colors flex items-center justify-center"
                   >
                     WhatsApp
                   </a>
                 </div>
               </div>
               {activeBooking.customer.email && (
-                <div className="text-xs text-slate-400">{activeBooking.customer.email}</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">{activeBooking.customer.email}</div>
               )}
               {activeBooking.address && (
-                <div className="pt-2 border-t border-slate-800/80 text-xs text-slate-400 flex items-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                   <span>{activeBooking.address}</span>
                 </div>
               )}
             </div>
 
             {/* Device & Diagnostics Box */}
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Laptop className="w-3.5 h-3.5 text-sky-400" />
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5 transition-colors duration-150">
+              <div className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Laptop className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>Device Specifications</span>
               </div>
-              <div className="text-sm font-bold text-white">
+              <div className="text-sm font-bold text-slate-900 dark:text-white">
                 {activeBooking.brand || ''} {activeBooking.deviceType}{' '}
                 {activeBooking.model ? `• ${activeBooking.model}` : ''}
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase text-slate-500 block">Reported Problem:</span>
-                <p className="text-xs text-slate-300 bg-slate-900 p-2.5 rounded-xl border border-slate-800 mt-1 leading-relaxed">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Reported Problem:</span>
+                <p className="text-xs text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 mt-1.5 leading-relaxed">
                   {activeBooking.problem}
                 </p>
               </div>
-              <div className="text-xs text-slate-400 flex items-center justify-between pt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between pt-1">
                 <span>Service Mode:</span>
-                <span className="font-semibold text-slate-200">
+                <span className="font-semibold text-slate-900 dark:text-slate-200">
                   {formatServiceModeLabel(activeBooking.serviceMode)}
                 </span>
               </div>
-              <div className="text-xs text-slate-400 flex items-center justify-between">
+              <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between">
                 <span>Service Category:</span>
-                <span className="font-semibold text-slate-200">{activeBooking.service.name}</span>
+                <span className="font-semibold text-slate-900 dark:text-slate-200">{activeBooking.service.name}</span>
               </div>
             </div>
 
             {/* Status Timeline History Box */}
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <History className="w-3.5 h-3.5 text-sky-400" />
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 transition-colors duration-150">
+              <div className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>Status History Timeline</span>
               </div>
 
-              <div className="space-y-3 text-xs pl-2 border-l border-slate-800">
+              <div className="space-y-3 text-xs pl-2 border-l border-slate-200 dark:border-slate-800">
                 {activeBooking.statusHistory && activeBooking.statusHistory.length > 0 ? (
                   activeBooking.statusHistory.map((h, i) => (
                     <div key={h.id || i} className="relative pl-3 space-y-0.5">
                       <span className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-sky-500" />
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white uppercase text-[10px]">
+                        <span className="font-bold text-slate-900 dark:text-white uppercase text-xs">
                           {h.toStatus}
                         </span>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {new Date(h.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
@@ -332,30 +332,30 @@ export default function ManageTicketModal({
                           })}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400">By {h.changedBy}</div>
+                      <div className="text-xs text-slate-600 dark:text-slate-400">By {h.changedBy}</div>
                       {h.note && (
-                        <p className="text-[11px] text-slate-300 italic bg-slate-900/60 p-1.5 rounded mt-0.5">
+                        <p className="text-xs text-slate-700 dark:text-slate-300 italic bg-white dark:bg-slate-900/60 p-2 rounded-lg border border-slate-200 dark:border-slate-800 mt-1 leading-relaxed">
                           "{h.note}"
                         </p>
                       )}
                     </div>
                   ))
                 ) : (
-                  <div className="text-slate-500 text-xs">No status change history recorded yet.</div>
+                  <div className="text-slate-500 dark:text-slate-400 text-xs">No status change history recorded yet.</div>
                 )}
               </div>
             </div>
           </div>
 
           {/* RIGHT COLUMN: TECHNICIAN WORKSPACE & EDIT FORM (7 Cols) */}
-          <div className="lg:col-span-7 space-y-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-sky-400" />
+          <div className="lg:col-span-7 space-y-5 bg-slate-50 dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-sky-500 dark:text-sky-400" />
                 <span>Technician Control & Pricing</span>
               </h3>
               {saveSuccess && (
-                <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle2 className="w-4 h-4" />
                   Saved Successfully
                 </span>
@@ -363,20 +363,20 @@ export default function ManageTicketModal({
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800/80 text-rose-300 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/50 dark:border-rose-800/80 dark:text-rose-300 text-xs font-semibold">
                 {errorMessage}
               </div>
             )}
 
             {/* 1. Status Transition Dropdown */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-300">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 Update Repair Stage / Status *
               </label>
               <select
                 value={editStatus}
                 onChange={(e) => setEditStatus(e.target.value as BookingStatus)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-sky-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               >
                 {ALL_BOOKING_STATUSES.map((st) => (
                   <option key={st.id} value={st.id}>
@@ -388,13 +388,13 @@ export default function ManageTicketModal({
 
             {/* Service Mode Selector */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-300">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 Service Mode
               </label>
               <select
                 value={editServiceMode}
                 onChange={(e) => setEditServiceMode(e.target.value as ServiceMode)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               >
                 <option value="shop_visit">Carry-In (Shop Visit)</option>
                 <option value="home_pickup">Home Pickup & Drop</option>
@@ -404,7 +404,7 @@ export default function ManageTicketModal({
 
             {/* Status Change Note */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-400">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Reason / Log for Status Change (Recorded in Audit Trail)
               </label>
               <input
@@ -412,14 +412,14 @@ export default function ManageTicketModal({
                 value={editStatusNote}
                 onChange={(e) => setEditStatusNote(e.target.value)}
                 placeholder="e.g. Disassembled laptop, screen replaced with FHD IPS panel, running stress test"
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               />
             </div>
 
             {/* 2. Quoted Amount & Final Amount */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                   Estimated / Quoted Cost (₹)
                 </label>
                 <div className="relative">
@@ -430,67 +430,67 @@ export default function ManageTicketModal({
                     value={editQuotedAmount}
                     onChange={(e) => setEditQuotedAmount(e.target.value)}
                     placeholder="e.g. 2800"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-sky-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
-                <span className="text-[10px] text-slate-500 block">Initial quote given to customer.</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 block mt-1">Initial quote given to customer.</span>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                   Final Invoice Amount (₹)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 font-bold">₹</span>
                   <input
                     type="number"
                     step="50"
                     value={editFinalAmount}
                     onChange={(e) => setEditFinalAmount(e.target.value)}
                     placeholder="e.g. 2650"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs sm:text-sm text-emerald-300 font-mono font-bold focus:outline-none focus:border-sky-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 font-mono font-bold focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
-                <span className="text-[10px] text-slate-500 block">Final charged upon completion.</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 block mt-1">Final charged upon completion.</span>
               </div>
             </div>
 
             {/* 3. Public Customer Tracking Note */}
             <div className="space-y-1.5 pt-2">
-              <label className="block text-xs font-bold text-sky-300 flex items-center justify-between">
+              <label className="block text-xs font-bold text-sky-700 dark:text-sky-300 flex items-center justify-between">
                 <span>Public Status Note (Shown on Customer Tracking Page)</span>
-                <span className="text-[10px] font-normal text-slate-400">Visible to customer</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Visible to customer</span>
               </label>
               <textarea
                 rows={2}
                 value={editPublicNote}
                 onChange={(e) => setEditPublicNote(e.target.value)}
                 placeholder="e.g. Motherboard diagnostics complete. Parts arrived, assembly in progress. Estimated delivery tomorrow."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 leading-relaxed"
               />
             </div>
 
             {/* 4. Internal Workshop Note */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-amber-300 flex items-center justify-between">
+              <label className="block text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center justify-between">
                 <span>Internal Technician Notes (Private Workshop Only)</span>
-                <span className="text-[10px] font-normal text-slate-400">Staff confidential</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Staff confidential</span>
               </label>
               <textarea
                 rows={2}
                 value={editInternalNote}
                 onChange={(e) => setEditInternalNote(e.target.value)}
                 placeholder="e.g. Replaced MOSFET PQ24, cleaned liquid residue near audio IC. Customer requested invoice on company name."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 leading-relaxed"
               />
             </div>
 
             {/* Save Button */}
-            <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-3">
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+                className="px-5 py-2.5 min-h-[38px] rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200 bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -499,7 +499,7 @@ export default function ManageTicketModal({
                 type="button"
                 disabled={isSaving}
                 onClick={handleSaveChanges}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-950 bg-sky-400 hover:bg-sky-300 active:bg-sky-500 transition-all shadow-md shadow-sky-500/20 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 min-h-[38px] rounded-xl text-xs sm:text-sm font-bold text-white dark:text-slate-950 bg-sky-500 hover:bg-sky-400 active:bg-sky-600 dark:bg-sky-400 dark:hover:bg-sky-300 dark:active:bg-sky-500 transition-all shadow-md shadow-sky-500/20 disabled:opacity-50 cursor-pointer"
               >
                 {isSaving ? (
                   <>

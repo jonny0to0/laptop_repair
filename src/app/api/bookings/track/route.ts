@@ -4,18 +4,31 @@ import { prisma } from '@/lib/prisma';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const query = searchParams.get('q')?.trim();
+    const rawQuery = searchParams.get('q') || searchParams.get('code') || '';
+    const query = rawQuery.trim();
 
     if (!query) {
       return NextResponse.json({ error: 'Please enter a booking code or mobile number.' }, { status: 400 });
     }
 
-    // Try finding by booking code first
-    let booking = await prisma.booking.findFirst({
+    const digitsOnly = query.replace(/[^0-9]/g, '');
+    const isPhoneSearch = digitsOnly.length >= 7;
+
+    // Search by booking code (case-insensitive) or customer mobile
+    const booking = await prisma.booking.findFirst({
       where: {
         OR: [
-          { bookingCode: query.toUpperCase() },
-          { customer: { mobile: query } },
+          { bookingCode: { equals: query } },
+          { bookingCode: { equals: query.toUpperCase() } },
+          ...(isPhoneSearch
+            ? [
+                { customer: { mobile: query } },
+                { customer: { mobile: { contains: digitsOnly } } },
+                ...(digitsOnly.length >= 10
+                  ? [{ customer: { mobile: { contains: digitsOnly.slice(-10) } } }]
+                  : []),
+              ]
+            : [{ customer: { mobile: query } }]),
         ],
       },
       include: {
@@ -29,7 +42,7 @@ export async function GET(req: Request) {
 
     if (!booking) {
       return NextResponse.json(
-        { error: 'No repair booking found matching the provided code or mobile number.' },
+        { error: 'No repair booking found matching the provided reference code or phone number.' },
         { status: 404 }
       );
     }
@@ -47,7 +60,8 @@ export async function GET(req: Request) {
         serviceMode: booking.serviceMode,
         serviceName: booking.service.name,
         status: booking.status,
-        quotedAmount: booking.quotedAmount,
+        quotedAmount: booking.quotedAmount ? Number(booking.quotedAmount) : null,
+        finalAmount: booking.finalAmount ? Number(booking.finalAmount) : null,
         createdAt: booking.createdAt,
         updatedAt: booking.updatedAt,
         statusHistory: booking.statusHistory.map((h) => ({

@@ -531,17 +531,17 @@ export default function CalculatorAdminClient({
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+            <span className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
               <Calculator className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               Cost Calculator Management
             </h1>
           </div>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
             Manage master base estimates, brand scaling multipliers, and hardware tiers in unified sync.
           </p>
         </div>
@@ -550,7 +550,7 @@ export default function CalculatorAdminClient({
           <Link
             href="/calculate-repair-cost"
             target="_blank"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition-colors shadow-xs"
           >
             <span>Live Public Calculator</span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
@@ -567,10 +567,10 @@ export default function CalculatorAdminClient({
       </div>
 
       {/* Unified Architecture Explainer Banner */}
-      <div className="bg-sky-950/30 border border-sky-800/40 rounded-2xl p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
-        <div className="text-xs text-sky-200/90 leading-relaxed">
-          <strong className="text-white block font-semibold mb-0.5">
+      <div className="bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/40 rounded-2xl p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
+        <div className="text-xs text-sky-900 dark:text-sky-200/90 leading-relaxed">
+          <strong className="text-slate-900 dark:text-white block font-semibold mb-0.5">
             Unified Pricing Formula:
           </strong>
           Every quote starts from the <strong>Master Base Estimate</strong> (set in the <em>Catalog Issues & Base Prices</em> tab) and is scaled by the <strong>Brand Multiplier</strong> (configured in the <em>Brand Category Pricing Matrix</em> tab). Updating the Base Estimate in the catalog immediately updates all brand quotes proportionally on the website!
@@ -578,38 +578,38 @@ export default function CalculatorAdminClient({
       </div>
 
       {/* Home Page "Calculate Repair Cost" Button Active / Deactivate Master Control */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg shadow-black/20">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm dark:shadow-lg dark:shadow-black/20">
         <div className="flex items-start sm:items-center gap-3.5">
           <div
             className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border transition-colors ${
               isButtonActive
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                : 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                : 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400'
             }`}
           >
             {isButtonActive ? <CheckCircle2 className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm sm:text-base font-bold text-white">
+              <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                 Home Page &ldquo;Calculate Repair Cost&rdquo; Button Status
               </span>
               <span
-                className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ${
                   isButtonActive
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                    : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                    ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-emerald-500/40'
+                    : 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/40'
                 }`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
-                    isButtonActive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                    isButtonActive ? 'bg-emerald-500 dark:bg-emerald-400 animate-pulse' : 'bg-amber-500 dark:bg-amber-400'
                   }`}
                 />
                 {isButtonActive ? 'Active (Live)' : 'Deactivated (Maintenance Mode)'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
               {isButtonActive
                 ? 'The home page button is live. Visitors clicking "Calculate Repair Cost" are navigated to the cost calculator page.'
                 : 'The home page button is deactivated. When clicked, visitors see a friendly "Oops!" modal with direct phone, WhatsApp, and shop contact details.'}
@@ -617,8 +617,8 @@ export default function CalculatorAdminClient({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
-          <span className="text-xs font-semibold text-slate-300">
+        <div className="flex items-center gap-3 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-800">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
             {isButtonActive ? 'Turn Off' : 'Turn On'}
           </span>
           <button
@@ -628,7 +628,7 @@ export default function CalculatorAdminClient({
             disabled={isTogglingButton}
             onClick={handleToggleCalculatorButton}
             className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden disabled:opacity-50 ${
-              isButtonActive ? 'bg-emerald-500' : 'bg-slate-700'
+              isButtonActive ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
             }`}
           >
             <span
@@ -641,13 +641,13 @@ export default function CalculatorAdminClient({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-800 gap-2 overflow-x-auto">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('brand_categories')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'brand_categories'
-              ? 'border-sky-500 text-sky-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Building2 className="w-4 h-4" />
@@ -658,8 +658,8 @@ export default function CalculatorAdminClient({
           onClick={() => setActiveTab('items')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'items'
-              ? 'border-sky-500 text-sky-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -670,8 +670,8 @@ export default function CalculatorAdminClient({
           onClick={() => setActiveTab('devices')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'devices'
-              ? 'border-sky-500 text-sky-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Laptop className="w-4 h-4" />
@@ -682,8 +682,8 @@ export default function CalculatorAdminClient({
           onClick={() => setActiveTab('brands')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'brands'
-              ? 'border-sky-500 text-sky-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Percent className="w-4 h-4" />
@@ -694,8 +694,8 @@ export default function CalculatorAdminClient({
           onClick={() => setActiveTab('simulator')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'simulator'
-              ? 'border-sky-500 text-sky-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Play className="w-4 h-4" />
@@ -707,25 +707,25 @@ export default function CalculatorAdminClient({
       {activeTab === 'brand_categories' && (
         <div className="space-y-6">
           {/* Top Control Bar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between shadow-xs">
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-sky-400" />
+              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                 <span>Brand Multipliers per Category</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 Adjust how much each manufacturer brand scales above or below the Master Base Estimate (e.g. Dell: 1.15x, Apple: 2.40x, HP: 1.00x).
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-semibold">
+              <div className="flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800 text-xs font-semibold">
                 <button
                   onClick={() => setMatrixViewMode('editor')}
                   className={`px-3 py-1.5 rounded-lg transition-colors ${
                     matrixViewMode === 'editor'
-                      ? 'bg-sky-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-sky-500 text-slate-950 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   Brand Editor
@@ -734,8 +734,8 @@ export default function CalculatorAdminClient({
                   onClick={() => setMatrixViewMode('overview')}
                   className={`px-3 py-1.5 rounded-lg transition-colors ${
                     matrixViewMode === 'overview'
-                      ? 'bg-sky-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-sky-500 text-slate-950 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   All-Brands Matrix
@@ -765,7 +765,7 @@ export default function CalculatorAdminClient({
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border ${
                         isSelected
                           ? 'bg-sky-500 border-sky-400 text-slate-950 shadow-md shadow-sky-500/20'
-                          : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800'
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                       }`}
                     >
                       <span>{brand}</span>
@@ -775,10 +775,10 @@ export default function CalculatorAdminClient({
               </div>
 
               {/* Quick Bulk Adjust for this Brand */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2 text-xs text-slate-300">
-                  <span className="font-bold text-white">{selectedMatrixBrand}</span>
-                  <span className="text-slate-500">•</span>
+              <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+                <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedMatrixBrand}</span>
+                  <span className="text-slate-400 dark:text-slate-500">•</span>
                   <span>Set uniform multiplier for all categories of {selectedMatrixBrand}:</span>
                 </div>
 
@@ -790,11 +790,11 @@ export default function CalculatorAdminClient({
                     max="3.0"
                     value={bulkMultiplier}
                     onChange={(e) => setBulkMultiplier(parseFloat(e.target.value) || 1.0)}
-                    className="w-20 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-400 font-mono font-bold text-center"
+                    className="w-20 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-600 dark:text-sky-400 font-mono font-bold text-center"
                   />
                   <button
                     onClick={() => handleBulkApplyMultiplier(selectedMatrixBrand, bulkMultiplier)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 transition-colors"
                   >
                     Apply to all categories
                   </button>
@@ -813,28 +813,28 @@ export default function CalculatorAdminClient({
                   return (
                     <div
                       key={category}
-                      className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xs"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xs"
                     >
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white text-sm">{category}</span>
-                          <span className="text-[11px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                          <span className="font-bold text-slate-900 dark:text-white text-sm">{category}</span>
+                          <span className="text-xs font-mono text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800">
                             Base: ₹{basePrice.min.toLocaleString('en-IN')} – ₹{basePrice.max.toLocaleString('en-IN')}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400 mt-1">
+                        <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                           Master base price comes from Catalog Issues. Brand multiplier scales this base.
                         </div>
                       </div>
 
                       {/* Controls Box */}
-                      <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-3">
+                      <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                         <div className="flex items-center justify-between">
                           <div>
-                            <label className="text-[11px] font-bold text-slate-300 block">
+                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
                               {selectedMatrixBrand} Multiplier
                             </label>
-                            <span className="text-[10px] text-slate-500">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
                               {currentMultiplier > 1
                                 ? `+${Math.round((currentMultiplier - 1) * 100)}% surcharge`
                                 : currentMultiplier < 1
@@ -854,15 +854,15 @@ export default function CalculatorAdminClient({
                                 const mult = parseFloat(e.target.value) || 1.0;
                                 handleUpdateBrandMultiplier(selectedMatrixBrand, category, mult);
                               }}
-                              className="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-400 text-center"
+                              className="w-24 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-600 dark:text-sky-400 text-center"
                             />
-                            <span className="text-xs text-slate-400 font-bold">x</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">x</span>
                           </div>
                         </div>
 
                         {/* Optional target starting price helper */}
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[11px]">
-                          <span className="text-slate-400">Target Starting Quote (₹):</span>
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs">
+                          <span className="text-slate-600 dark:text-slate-400 font-medium">Target Starting Quote (₹):</span>
                           <input
                             type="number"
                             step="50"
@@ -875,23 +875,23 @@ export default function CalculatorAdminClient({
                                 handleUpdateBrandMultiplier(selectedMatrixBrand, category, computedMult);
                               }
                             }}
-                            className="w-24 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-slate-300 text-center"
+                            className="w-24 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2 py-1 text-xs font-mono text-slate-800 dark:text-slate-300 text-center"
                             title="Typing a target starting price will automatically set the multiplier"
                           />
                         </div>
                       </div>
 
                       {/* Live Quote Output Badge */}
-                      <div className="bg-gradient-to-r from-slate-950 to-slate-900 px-3.5 py-2.5 rounded-xl border border-sky-500/20 flex items-center justify-between">
+                      <div className="bg-slate-100 dark:bg-gradient-to-r dark:from-slate-950 dark:to-slate-900 px-3.5 py-2.5 rounded-xl border border-sky-300/40 dark:border-sky-500/20 flex items-center justify-between">
                         <div>
-                          <span className="text-[10px] uppercase font-bold text-sky-400 block tracking-wider">
+                          <span className="text-xs uppercase font-bold text-sky-700 dark:text-sky-400 block tracking-wider">
                             Website Customer Quote ({selectedMatrixBrand})
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                             Base ₹{basePrice.min} × {currentMultiplier}x
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-sm text-emerald-400">
+                        <span className="font-mono font-bold text-sm text-emerald-600 dark:text-emerald-400">
                           ₹{computedMin.toLocaleString('en-IN')} – ₹{computedMax.toLocaleString('en-IN')}
                         </span>
                       </div>
@@ -904,11 +904,11 @@ export default function CalculatorAdminClient({
 
           {/* OVERVIEW MATRIX TABLE */}
           {matrixViewMode === 'overview' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-white">Cross-Brand Cost Comparison Matrix</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Cross-Brand Cost Comparison Matrix</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Master Base Estimate vs Calculated Brand Quotes across all categories.
                   </p>
                 </div>
@@ -916,28 +916,28 @@ export default function CalculatorAdminClient({
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-950/70 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+                  <thead className="bg-slate-50 dark:bg-slate-950/70 text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs font-bold border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                      <th className="px-4 py-3 font-semibold sticky left-0 bg-slate-950 z-10">Category</th>
-                      <th className="px-4 py-3 font-semibold text-center bg-slate-950/90 text-sky-400 border-r border-slate-800">
+                      <th className="px-4 py-3 sticky left-0 bg-slate-50 dark:bg-slate-950 z-10">Category</th>
+                      <th className="px-4 py-3 text-center bg-slate-100/60 dark:bg-slate-950/90 text-sky-700 dark:text-sky-400 border-r border-slate-200 dark:border-slate-800">
                         Master Base Estimate
                       </th>
                       {brands.map((b) => (
-                        <th key={b} className="px-4 py-3 font-semibold text-center whitespace-nowrap">
+                        <th key={b} className="px-4 py-3 text-center whitespace-nowrap">
                           {b}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                     {distinctCategories.map((cat) => {
                       const base = categoryBasePrices[cat] || { min: 2000, max: 4000 };
                       return (
-                        <tr key={cat} className="hover:bg-slate-800/30 transition-colors">
-                          <td className="px-4 py-3 font-semibold text-white whitespace-nowrap sticky left-0 bg-slate-900 z-10 border-r border-slate-800">
+                        <tr key={cat} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                          <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white whitespace-nowrap sticky left-0 bg-white dark:bg-slate-900 z-10 border-r border-slate-200 dark:border-slate-800">
                             {cat}
                           </td>
-                          <td className="px-4 py-3 text-center whitespace-nowrap bg-slate-950/40 border-r border-slate-800 font-mono font-bold text-sky-300">
+                          <td className="px-4 py-3 text-center whitespace-nowrap bg-slate-50/70 dark:bg-slate-950/40 border-r border-slate-200 dark:border-slate-800 font-mono font-bold text-sky-700 dark:text-sky-300">
                             ₹{base.min.toLocaleString('en-IN')} – ₹{base.max.toLocaleString('en-IN')}
                           </td>
                           {brands.map((b) => {
@@ -950,12 +950,12 @@ export default function CalculatorAdminClient({
                               <td key={b} className="px-3 py-3 text-center whitespace-nowrap">
                                 <div
                                   className={`font-mono font-bold text-xs ${
-                                    isDifferent ? 'text-emerald-400' : 'text-slate-300'
+                                    isDifferent ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'
                                   }`}
                                 >
                                   ₹{minVal.toLocaleString('en-IN')} – ₹{maxVal.toLocaleString('en-IN')}
                                 </div>
-                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                   {mult}x
                                 </div>
                               </td>
@@ -976,9 +976,9 @@ export default function CalculatorAdminClient({
       {activeTab === 'items' && (
         <div className="space-y-4">
           {/* Information Notice */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex items-center justify-between text-xs text-slate-300">
+          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 shadow-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>
                 <strong>Base Estimate Column:</strong> This is the master foundational price bracket. It is displayed on customer issue cards and scaled by the brand multipliers.
               </span>
@@ -986,22 +986,22 @@ export default function CalculatorAdminClient({
             <Link
               href="#brand-categories"
               onClick={() => setActiveTab('brand_categories')}
-              className="text-sky-400 hover:underline font-semibold shrink-0"
+              className="text-sky-600 dark:text-sky-400 hover:underline font-semibold shrink-0"
             >
               Configure Brand Scaling →
             </Link>
           </div>
 
           {/* Filter Bar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
             <div className="relative w-full md:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search issues, category, parts..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               />
             </div>
 
@@ -1013,7 +1013,7 @@ export default function CalculatorAdminClient({
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors whitespace-nowrap ${
                     selectedCategory === cat
                       ? 'bg-sky-500 text-slate-950 font-bold'
-                      : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   {cat}
@@ -1023,21 +1023,21 @@ export default function CalculatorAdminClient({
           </div>
 
           {/* Issues Table */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950/70 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-950/70 text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs font-bold border-b border-slate-200 dark:border-slate-800">
                   <tr>
-                    <th className="px-5 py-3 font-semibold">Repair Issue</th>
-                    <th className="px-5 py-3 font-semibold">Category</th>
-                    <th className="px-5 py-3 font-semibold text-sky-400">Master Base Estimate</th>
-                    <th className="px-5 py-3 font-semibold">Tiers</th>
-                    <th className="px-5 py-3 font-semibold">Turnaround & Warranty</th>
-                    <th className="px-5 py-3 font-semibold text-center">Active</th>
-                    <th className="px-5 py-3 font-semibold text-right">Actions</th>
+                    <th className="px-5 py-3">Repair Issue</th>
+                    <th className="px-5 py-3">Category</th>
+                    <th className="px-5 py-3 text-sky-700 dark:text-sky-400">Master Base Estimate</th>
+                    <th className="px-5 py-3">Tiers</th>
+                    <th className="px-5 py-3">Turnaround & Warranty</th>
+                    <th className="px-5 py-3 text-center">Active</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                   {filteredItems.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-5 py-12 text-center text-slate-500">
@@ -1057,22 +1057,22 @@ export default function CalculatorAdminClient({
                       }
 
                       return (
-                        <tr key={item.id} className="hover:bg-slate-800/40 transition-colors">
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                           <td className="px-5 py-4">
                             <div className="flex items-start gap-3">
-                              <div className="p-2 rounded-xl bg-slate-800 text-sky-400 shrink-0 mt-0.5">
+                              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5">
                                 <IconComponent className="w-4 h-4" />
                               </div>
                               <div>
-                                <div className="font-semibold text-white flex items-center gap-2">
+                                <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                                   <span>{item.name}</span>
                                   {item.tag && (
-                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                                       {item.tag}
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-1 max-w-sm">
+                                <div className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-1 max-w-sm">
                                   {item.description}
                                 </div>
                               </div>
@@ -1080,40 +1080,40 @@ export default function CalculatorAdminClient({
                           </td>
 
                           <td className="px-5 py-4">
-                            <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               {item.category}
                             </span>
                           </td>
 
                           <td className="px-5 py-4">
-                            <div className="font-mono font-bold text-sky-400 text-sm">
+                            <div className="font-mono font-bold text-sky-600 dark:text-sky-400 text-sm">
                               ₹{item.baseMin.toLocaleString('en-IN')} – ₹{item.baseMax.toLocaleString('en-IN')}
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">Master Base (1.0x)</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Master Base (1.0x)</div>
                           </td>
 
                           <td className="px-5 py-4">
                             {tiers.length > 0 ? (
                               <div className="space-y-1">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
                                   {tiers.length} Tiers Configured
                                 </span>
-                                <div className="text-[10px] text-slate-400 line-clamp-1">
+                                <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
                                   {tiers.map((t) => `${t.label} (${t.priceMultiplier}x)`).join(', ')}
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-slate-500 text-[11px]">Flat rate (No tiers)</span>
+                              <span className="text-slate-500 dark:text-slate-400 text-xs">Flat rate (No tiers)</span>
                             )}
                           </td>
 
                           <td className="px-5 py-4">
-                            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+                            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
                               <Clock className="w-3.5 h-3.5 text-slate-400" />
                               <span>{item.turnaround}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-slate-400 text-[11px] mt-0.5">
-                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                            <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-xs mt-0.5">
+                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                               <span>{item.warranty}</span>
                             </div>
                           </td>
@@ -1121,10 +1121,10 @@ export default function CalculatorAdminClient({
                           <td className="px-5 py-4 text-center">
                             <button
                               onClick={() => handleToggleActive(item)}
-                              className={`p-1.5 rounded-lg border transition-colors ${
+                              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-colors mx-auto ${
                                 item.isActive
-                                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                                  : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300'
+                                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                               }`}
                               title={item.isActive ? 'Active on public calculator' : 'Hidden from calculator'}
                             >
@@ -1140,7 +1140,7 @@ export default function CalculatorAdminClient({
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => openEditModal(item)}
-                                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white transition-colors border border-slate-200 dark:border-transparent flex items-center justify-center"
                                 title="Edit Master Base Prices"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
@@ -1148,7 +1148,7 @@ export default function CalculatorAdminClient({
                               {userRole === 'owner' && (
                                 <button
                                   onClick={() => handleDeleteItem(item)}
-                                  className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/20"
+                                  className="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 dark:text-rose-400 transition-colors border border-rose-200 dark:border-rose-500/20 flex items-center justify-center"
                                   title="Delete Issue"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1169,11 +1169,11 @@ export default function CalculatorAdminClient({
 
       {/* TAB 2: DEVICE MULTIPLIERS */}
       {activeTab === 'devices' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6 shadow-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h2 className="text-base font-bold text-white">Device Architecture Multipliers</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Device Architecture Multipliers</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 Adjust price scale multiplier based on hardware complexity (e.g. Apple MacBook logic boards and compact chassis take longer to service).
               </p>
             </div>
@@ -1190,21 +1190,21 @@ export default function CalculatorAdminClient({
             {devices.map((dev, idx) => (
               <div
                 key={dev.id}
-                className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4"
+                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4 shadow-2xs"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-white text-sm">{dev.label}</span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <span className="font-bold text-slate-900 dark:text-white text-sm">{dev.label}</span>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20">
                       ID: {dev.id}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">{dev.tagline}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{dev.tagline}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200 dark:border-slate-800/80">
                   <div>
-                    <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                    <label className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold tracking-wider block mb-1">
                       Display Tagline
                     </label>
                     <input
@@ -1216,12 +1216,12 @@ export default function CalculatorAdminClient({
                           prev.map((d, i) => (i === idx ? { ...d, tagline: val } : d))
                         );
                       }}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                    <label className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold tracking-wider block mb-1">
                       Multiplier (e.g. 1.35x)
                     </label>
                     <input
@@ -1236,7 +1236,7 @@ export default function CalculatorAdminClient({
                           prev.map((d, i) => (i === idx ? { ...d, multiplier: val } : d))
                         );
                       }}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-400"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-600 dark:text-sky-400"
                     />
                   </div>
                 </div>
@@ -1248,11 +1248,11 @@ export default function CalculatorAdminClient({
 
       {/* TAB 3: BRAND LIST */}
       {activeTab === 'brands' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6 shadow-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h2 className="text-base font-bold text-white">Brand Directory & Default Fallbacks</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Brand Directory & Default Fallbacks</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 Manage supported brands and general fallbacks. For category rates (Display, Battery, etc.), use the Brand Category Pricing Matrix.
               </p>
             </div>
@@ -1271,11 +1271,11 @@ export default function CalculatorAdminClient({
               return (
                 <div
                   key={brand}
-                  className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between"
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center justify-between shadow-2xs"
                 >
                   <div>
-                    <div className="font-semibold text-white text-sm">{brand}</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm">{brand}</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
                       {currentMultiplier > 1.0 ? `+${Math.round((currentMultiplier - 1) * 100)}% Global Markup` : 'Standard Base'}
                     </div>
                   </div>
@@ -1294,7 +1294,7 @@ export default function CalculatorAdminClient({
                           [brand]: val,
                         }));
                       }}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-400 text-center"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-sky-600 dark:text-sky-400 text-center"
                     />
                   </div>
                 </div>
@@ -1307,22 +1307,22 @@ export default function CalculatorAdminClient({
       {/* TAB 4: SIMULATOR */}
       {activeTab === 'simulator' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-sky-400" />
+          <div className="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-xs">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-sky-600 dark:text-sky-400" />
               <span>Simulate Customer Selections</span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Verify how the Master Base Estimate and Brand Multiplier combine into the customer quote.
             </p>
 
             <div className="space-y-4 pt-2">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1.5">Select Brand</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Select Brand</label>
                 <select
                   value={simBrand}
                   onChange={(e) => setSimBrand(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                 >
                   {brands.map((b) => (
                     <option key={b} value={b}>
@@ -1333,11 +1333,11 @@ export default function CalculatorAdminClient({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1.5">Select Device Type</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Select Device Type</label>
                 <select
                   value={simDevice}
                   onChange={(e) => setSimDevice(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                 >
                   {devices.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -1348,7 +1348,7 @@ export default function CalculatorAdminClient({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1.5">Select Repair Issue</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Select Repair Issue</label>
                 <select
                   value={simItemCode}
                   onChange={(e) => {
@@ -1363,7 +1363,7 @@ export default function CalculatorAdminClient({
                       }
                     }
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                 >
                   {items.map((i) => (
                     <option key={i.code} value={i.code}>
@@ -1375,11 +1375,11 @@ export default function CalculatorAdminClient({
 
               {simCalculation?.item.tierOptionsJson && (
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1.5">Select Quality Tier</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Select Quality Tier</label>
                   <select
                     value={simTierId}
                     onChange={(e) => setSimTierId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                   >
                     {(() => {
                       try {
@@ -1399,71 +1399,71 @@ export default function CalculatorAdminClient({
             </div>
           </div>
 
-          <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-xs">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                 Live Calculation Output
               </span>
-              <h3 className="text-xl font-bold text-white mt-1">{simCalculation?.item.name}</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                For <strong className="text-sky-300">{simBrand}</strong> {simDevice}{' '}
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{simCalculation?.item.name}</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                For <strong className="text-sky-600 dark:text-sky-300">{simBrand}</strong> {simDevice}{' '}
                 {simCalculation?.tierLabel ? `• ${simCalculation.tierLabel}` : ''}
               </p>
 
               {/* Master Base to Brand Multiplier Breakdown */}
-              <div className="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
-                <div className="flex items-center justify-between text-slate-400">
+              <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+                <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                   <span>Master Base Estimate (Catalog):</span>
-                  <span className="font-mono font-bold text-white">
+                  <span className="font-mono font-bold text-slate-900 dark:text-white">
                     ₹{simCalculation?.baseMin.toLocaleString('en-IN')} – ₹{simCalculation?.baseMax.toLocaleString('en-IN')}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-slate-400">
+                <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
                   <span>Brand Multiplier ({simBrand}):</span>
-                  <span className="font-mono font-bold text-sky-400">
+                  <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
                     {simCalculation?.brandMult}x{' '}
-                    <span className="text-slate-500 font-normal">
+                    <span className="text-slate-500 dark:text-slate-400 font-normal">
                       ({simCalculation?.item.category})
                     </span>
                   </span>
                 </div>
               </div>
 
-              <div className="my-5 p-6 rounded-2xl bg-slate-950 border border-slate-800 text-center">
-                <div className="text-xs text-slate-400 font-medium">Resulting Customer Quote</div>
-                <div className="text-3xl font-extrabold text-emerald-400 mt-2 font-mono">
+              <div className="my-5 p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center">
+                <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">Resulting Customer Quote</div>
+                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2 font-mono">
                   ₹{simCalculation?.min.toLocaleString('en-IN')} – ₹{simCalculation?.max.toLocaleString('en-IN')}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">
+                <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Compound Multiplier: {simCalculation?.totalMultiplier}x
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-slate-400 block mb-1">Turnaround Time</span>
-                  <span className="font-semibold text-white flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-sky-400" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400 block mb-1">Turnaround Time</span>
+                  <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     {simCalculation?.turnaround}
                   </span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-slate-400 block mb-1">Warranty Package</span>
-                  <span className="font-semibold text-white flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400 block mb-1">Warranty Package</span>
+                  <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     {simCalculation?.warranty}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-slate-800 mt-6 flex items-center justify-between text-xs text-slate-400">
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800 mt-6 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Switching brands directly scales the Master Base Estimate.</span>
               <Link
                 href="/calculate-repair-cost"
                 target="_blank"
-                className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
+                className="text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 font-semibold"
               >
                 Open Site Calculator <ExternalLink className="w-3 h-3" />
               </Link>
@@ -1474,15 +1474,15 @@ export default function CalculatorAdminClient({
 
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h2 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-xs overflow-y-auto flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                 {editingItem ? `Edit: ${editingItem.name}` : 'Create New Repair Issue'}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1491,7 +1491,7 @@ export default function CalculatorAdminClient({
             <form onSubmit={handleSaveItem} className="space-y-4 pt-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Issue Title / Name *
                   </label>
                   <input
@@ -1500,12 +1500,12 @@ export default function CalculatorAdminClient({
                     placeholder="e.g. Broken Display / Screen Replacement"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Category *
                   </label>
                   <input
@@ -1514,20 +1514,20 @@ export default function CalculatorAdminClient({
                     placeholder="e.g. Display & Glass Panel, Battery & Charging"
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Associated Service Category
                   </label>
                   <select
                     value={formServiceSlug}
                     onChange={(e) => setFormServiceSlug(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                   >
                     {services.map((s) => (
                       <option key={s.slug} value={s.slug}>
@@ -1538,13 +1538,13 @@ export default function CalculatorAdminClient({
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Icon Symbol
                   </label>
                   <select
                     value={formIcon}
                     onChange={(e) => setFormIcon(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500"
                   >
                     <option value="Monitor">Monitor / Screen</option>
                     <option value="BatteryCharging">BatteryCharging</option>
@@ -1559,7 +1559,7 @@ export default function CalculatorAdminClient({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Symptoms & Problem Description *
                 </label>
                 <textarea
@@ -1568,14 +1568,14 @@ export default function CalculatorAdminClient({
                   placeholder="Detail the issue symptoms..."
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
                 />
               </div>
 
               {/* Master Price Bracket */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <label className="text-xs uppercase font-bold text-slate-600 dark:text-slate-400 block mb-1">
                     Master Base Min (₹) *
                   </label>
                   <input
@@ -1585,12 +1585,12 @@ export default function CalculatorAdminClient({
                     step="50"
                     value={formBaseMin}
                     onChange={(e) => setFormBaseMin(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-400 font-bold font-mono"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-600 dark:text-sky-400 font-bold font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <label className="text-xs uppercase font-bold text-slate-600 dark:text-slate-400 block mb-1">
                     Master Base Max (₹) *
                   </label>
                   <input
@@ -1600,12 +1600,12 @@ export default function CalculatorAdminClient({
                     step="50"
                     value={formBaseMax}
                     onChange={(e) => setFormBaseMax(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-400 font-bold font-mono"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-sky-600 dark:text-sky-400 font-bold font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <label className="text-xs uppercase font-bold text-slate-600 dark:text-slate-400 block mb-1">
                     Turnaround *
                   </label>
                   <input
@@ -1614,12 +1614,12 @@ export default function CalculatorAdminClient({
                     placeholder="1 - 2 Hours"
                     value={formTurnaround}
                     onChange={(e) => setFormTurnaround(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                  <label className="text-xs uppercase font-bold text-slate-600 dark:text-slate-400 block mb-1">
                     Highlight Tag
                   </label>
                   <input
@@ -1627,13 +1627,13 @@ export default function CalculatorAdminClient({
                     placeholder="e.g. Quick 2-Hour Swap"
                     value={formTag}
                     onChange={(e) => setFormTag(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Warranty Text *
                 </label>
                 <input
@@ -1642,20 +1642,20 @@ export default function CalculatorAdminClient({
                   placeholder="e.g. 90-Day Parts & Labor Warranty"
                   value={formWarranty}
                   onChange={(e) => setFormWarranty(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
                 />
               </div>
 
               {/* Part Quality Tiers */}
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-slate-300">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     Part Quality / Option Tiers ({formTiers.length})
                   </label>
                   <button
                     type="button"
                     onClick={handleAddTier}
-                    className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-semibold"
+                    className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 flex items-center gap-1 font-semibold"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Tier</span>
@@ -1666,7 +1666,7 @@ export default function CalculatorAdminClient({
                   {formTiers.map((tier, idx) => (
                     <div
                       key={tier.id || idx}
-                      className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-3"
+                      className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center gap-3"
                     >
                       <div className="flex-1">
                         <input
@@ -1674,19 +1674,19 @@ export default function CalculatorAdminClient({
                           placeholder="Tier Name (e.g. Genuine Grade / High-End)"
                           value={tier.label}
                           onChange={(e) => handleTierChange(idx, 'label', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white mb-1"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-white mb-1"
                         />
                         <input
                           type="text"
                           placeholder="Short description note"
                           value={tier.note || ''}
                           onChange={(e) => handleTierChange(idx, 'note', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-slate-400"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-600 dark:text-slate-400"
                         />
                       </div>
 
                       <div className="w-24 shrink-0 text-center">
-                        <label className="text-[10px] text-slate-400 block mb-0.5">Multiplier</label>
+                        <label className="text-xs text-slate-600 dark:text-slate-400 block mb-1 font-semibold">Multiplier</label>
                         <input
                           type="number"
                           step="0.05"
@@ -1696,14 +1696,14 @@ export default function CalculatorAdminClient({
                           onChange={(e) =>
                             handleTierChange(idx, 'priceMultiplier', parseFloat(e.target.value) || 1.0)
                           }
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-sky-400 font-bold font-mono text-center"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-2 py-1 text-xs text-sky-600 dark:text-sky-400 font-bold font-mono text-center"
                         />
                       </div>
 
                       <button
                         type="button"
                         onClick={() => handleRemoveTier(idx)}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 transition-colors"
+                        className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -1713,13 +1713,13 @@ export default function CalculatorAdminClient({
               </div>
 
               {/* Status and Sort Order */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-                <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formIsActive}
                     onChange={(e) => setFormIsActive(e.target.checked)}
-                    className="w-4 h-4 rounded text-sky-500 bg-slate-950 border-slate-800"
+                    className="w-4 h-4 rounded text-sky-500 bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-800"
                   />
                   <span>Active & visible on public calculator</span>
                 </label>
@@ -1728,14 +1728,14 @@ export default function CalculatorAdminClient({
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300"
+                    className="min-h-[38px] px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2 rounded-xl text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 disabled:opacity-50"
+                    className="min-h-[38px] px-5 py-2 rounded-xl text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 transition-colors disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : editingItem ? 'Save Changes' : 'Create Issue'}
                   </button>

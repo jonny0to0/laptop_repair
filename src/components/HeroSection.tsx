@@ -78,17 +78,9 @@ export default function HeroSection({
   const [isOopsModalOpen, setIsOopsModalOpen] = useState(false);
   const [isCalcActive, setIsCalcActive] = useState(isCalculatorActive);
 
-  // Sync prop and fetch live button status to prevent stale cache
+  // Sync prop when updated
   useEffect(() => {
     setIsCalcActive(isCalculatorActive);
-    fetch('/api/admin/calculator/button-status')
-      .then((r) => r.json())
-      .then((data) => {
-        if (typeof data.active === 'boolean') {
-          setIsCalcActive(data.active);
-        }
-      })
-      .catch(() => {});
   }, [isCalculatorActive]);
 
   const handleCalculatorClick = (e: React.MouseEvent) => {

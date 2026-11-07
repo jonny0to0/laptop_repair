@@ -1,29 +1,44 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   X,
   ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle,
   CheckCircle2,
-  Building2,
-  Truck,
-  UserCheck,
-  Send,
-  Loader2,
-  Lock,
   Calendar,
   Clock,
   Laptop,
-  Check,
-  ExternalLink,
-  ChevronDown,
+  Monitor,
+  Phone,
+  Mail,
+  MapPin,
+  User,
+  Tag,
+  Barcode,
+  Bell,
+  Info,
   ShieldCheck,
+  Shield,
+  Zap,
   Copy,
   Sparkles,
   Wrench,
+  Headphones,
+  Edit3,
+  Loader2,
+  Lock,
+  Home,
+  FileText,
+  ChevronDown,
+  AlertCircle,
 } from 'lucide-react';
-import { ProblemItem } from './ProblemPicker';
+import { ProblemItem, PROBLEMS_DATA } from './ProblemPicker';
 
 export interface ServiceOption {
   id: number;
@@ -48,14 +63,43 @@ interface RepairBookingModalProps {
   selectedBrand?: string;
   selectedDevice?: string;
   estimateRange?: string;
+  companyName?: string;
+  phone?: string;
 }
 
 const DEFAULT_SERVICES: ServiceOption[] = [
   { id: 1, name: 'Laptop Repair', slug: 'laptop-repair' },
-  { id: 2, name: 'Desktop & PC Repair', slug: 'desktop-pc-repair' },
+  { id: 2, name: 'Desktop & PC Repair', slug: 'desktop-repair' },
   { id: 3, name: 'Software & OS Services', slug: 'software-os-services' },
-  { id: 4, name: 'Data Recovery', slug: 'data-recovery' },
-  { id: 5, name: 'Networking Services', slug: 'networking-services' },
+  { id: 4, name: 'Networking & IT Support', slug: 'networking-services' },
+];
+
+const DEVICE_OPTIONS = [
+  'Laptop',
+  'Desktop',
+  'All-in-One PC',
+  'MacBook / iMac',
+  'Custom Gaming Rig',
+];
+
+const SERVICE_CATEGORY_OPTIONS = [
+  'Display & Glass Panel',
+  'Display Repair',
+  'Power & Logic Board',
+  'Motherboard & Chipset',
+  'Battery & Charging',
+  'Keyboard & Trackpad',
+  'System & OS Recovery',
+  'Data Recovery & Storage',
+  'Comprehensive Diagnostic',
+];
+
+const TIME_SLOTS = [
+  '10:00 AM – 12:00 PM',
+  '12:00 PM – 02:00 PM',
+  '02:00 PM – 04:00 PM',
+  '04:00 PM – 06:00 PM',
+  '06:00 PM – 08:00 PM',
 ];
 
 export default function RepairBookingModal({
@@ -68,65 +112,88 @@ export default function RepairBookingModal({
   selectedBrand,
   selectedDevice,
   estimateRange,
+  companyName = 'ProTech IT & Computer Repair',
+  phone = '+91 98765 43210',
 }: RepairBookingModalProps) {
-  const activeServices = services && services.length > 0 ? services : DEFAULT_SERVICES;
+  const router = useRouter();
+  const modalScrollRef = useRef<HTMLDivElement>(null);
 
-  // Form states
-  const [deviceType, setDeviceType] = useState('Laptop (Windows / Mac / Chromebook)');
-  const [serviceSlug, setServiceSlug] = useState('laptop-repair');
+  // Current Step: 1 = Your Details, 2 = Appointment, 3 = Confirmation
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  // Step 1: Device & Service Details
+  const [deviceType, setDeviceType] = useState('Laptop');
+  const [serviceCategory, setServiceCategory] = useState('Display & Glass Panel');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
-  const [problemText, setProblemText] = useState('');
-  const [serviceMode, setServiceMode] = useState<'shop_visit' | 'home_pickup' | 'on_site'>('shop_visit');
-  const [preferredDate, setPreferredDate] = useState('');
-  const [preferredSlot, setPreferredSlot] = useState('Morning (9:00 AM - 1:00 PM)');
+  const [selectedIssueTitle, setSelectedIssueTitle] = useState('Broken / Glitching Screen');
+  const [isChangingIssue, setIsChangingIssue] = useState(false);
+
+  // Step 1: Customer Information
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [areaSlug, setAreaSlug] = useState('');
+  const [address, setAddress] = useState('Dasturhat, Murshidabad, West Bengal');
+  const [agreeTerms, setAgreeTerms] = useState(true);
 
-  // UI status states
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Step 2: Appointment Details
+  const [preferredDate, setPreferredDate] = useState('');
+  const [preferredSlot, setPreferredSlot] = useState('10:00 AM – 12:00 PM');
+  const [notes, setNotes] = useState('');
+  const [smsUpdates, setSmsUpdates] = useState(true);
+  const [emailUpdates, setEmailUpdates] = useState(true);
+
+  // Availability validation
+  const [availabilityWarning, setAvailabilityWarning] = useState<string | null>(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+
+  // Submission & UI status
+  const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<{
     bookingCode: string;
     serviceName: string;
     deviceType: string;
+    brand?: string;
+    model?: string;
     problem: string;
-    serviceMode: string;
+    preferredDate?: string;
+    preferredSlot?: string;
   } | null>(null);
 
-  // Sync state whenever selected problem changes
+  // Set default preferred date to tomorrow's date
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.toISOString().split('T')[0];
+    setPreferredDate(dateStr);
+  }, []);
+
+  // Sync state whenever selected problem or calculator props change
   useEffect(() => {
     if (problem) {
-      const fullProblemText = problem.subtitle
-        ? `${problem.title} • ${problem.subtitle}`
-        : problem.title;
-      setProblemText(fullProblemText);
-      setServiceSlug(problem.serviceSlug || 'laptop-repair');
-
-      if (selectedBrand) {
-        setBrand(selectedBrand);
-      } else {
-        setBrand('');
+      setSelectedIssueTitle(problem.title || 'Broken / Glitching Screen');
+      if (problem.category) {
+        setServiceCategory(problem.category);
       }
-
-      if (selectedDevice) {
-        setDeviceType(selectedDevice);
-      } else if (problem.deviceType === 'Desktop') {
-        setDeviceType('Desktop / All-in-One PC');
-      } else {
-        setDeviceType('Laptop (Windows / Mac / Chromebook)');
+      if (problem.deviceType) {
+        setDeviceType(problem.deviceType);
       }
-
-      setErrorMessage(null);
-      setConfirmedBooking(null);
     }
-  }, [problem, selectedBrand, selectedDevice]);
 
-  // Lock body scroll and handle Escape key safely
+    if (selectedDevice) {
+      setDeviceType(selectedDevice);
+    }
+    if (selectedBrand) {
+      setBrand(selectedBrand);
+    }
+
+    setValidationError(null);
+  }, [problem, selectedDevice, selectedBrand]);
+
+  // Lock body scroll and handle Escape key
   useEffect(() => {
     if (!isOpen) return;
 
@@ -146,628 +213,1298 @@ export default function RepairBookingModal({
     };
   }, [isOpen, onClose]);
 
+  // Check appointment availability when preferredDate changes
+  useEffect(() => {
+    if (!preferredDate) return;
+
+    let isMounted = true;
+    const checkDateAvailability = async () => {
+      setCheckingAvailability(true);
+      try {
+        const res = await fetch(`/api/availability?date=${encodeURIComponent(preferredDate)}`);
+        const data = await res.json();
+        if (isMounted) {
+          if (data && data.available === false) {
+            setAvailabilityWarning(data.reason || 'Selected date is not available for bookings.');
+          } else {
+            setAvailabilityWarning(null);
+          }
+        }
+      } catch {
+        if (isMounted) setAvailabilityWarning(null);
+      } finally {
+        if (isMounted) setCheckingAvailability(false);
+      }
+    };
+
+    checkDateAvailability();
+    return () => {
+      isMounted = false;
+    };
+  }, [preferredDate]);
+
   if (!isOpen) return null;
 
-  // Set today's date as min
-  const todayDateString = new Date().toISOString().split('T')[0];
+  // Format date nicely for display, e.g. "12 Nov 2026"
+  const formatDisplayDate = (dString: string) => {
+    if (!dString) return 'Not Selected';
+    try {
+      const parts = dString.split('-');
+      if (parts.length === 3) {
+        const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        return dateObj.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+      }
+      const d = new Date(dString);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+      }
+    } catch {
+      // fallback
+    }
+    return dString;
+  };
 
+  const todayMinDate = new Date().toISOString().split('T')[0];
+
+  // Copy booking code
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2500);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Step 1 Validation -> Proceed to Step 2
+  const handleProceedToAppointment = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
-    setLoading(true);
+    setValidationError(null);
+
+    if (!name.trim()) {
+      setValidationError('Please enter your full name.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (!mobile.trim() || mobile.trim().length < 8) {
+      setValidationError('Please enter a valid phone number (at least 8 digits).');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (!address.trim()) {
+      setValidationError('Please enter your complete service or pickup address.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (!agreeTerms) {
+      setValidationError('Please agree to the terms and conditions and service policy.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setCurrentStep(2);
+    setTimeout(() => {
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
+  };
+
+  // Step 2 Validation -> Proceed to Step 3 (Review & Confirmation)
+  const handleProceedToConfirmation = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+
+    if (!preferredDate) {
+      setValidationError('Please select your preferred appointment date.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (!preferredSlot) {
+      setValidationError('Please choose a preferred time slot.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (availabilityWarning) {
+      setValidationError('The selected date is unavailable. Please choose another date.');
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setCurrentStep(3);
+    setTimeout(() => {
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
+  };
+
+  // Step 3: Final Confirmation Action -> Submit to Backend API
+  const handleFinalConfirmBooking = async () => {
+    if (submitting) return; // Strict duplicate prevention
+    setSubmitting(true);
+    setValidationError(null);
 
     try {
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          mobile,
-          email,
-          deviceType: selectedDevice || deviceType,
-          brand: selectedBrand || brand,
-          model: model || (isFromCalculator ? 'Calculator Pre-Selected' : ''),
-          problem: problemText,
-          serviceSlug,
-          serviceMode,
-          preferredDate,
-          preferredSlot,
-          address,
-          areaSlug,
+          name: name.trim(),
+          mobile: mobile.trim(),
+          email: email.trim() || undefined,
+          deviceType: deviceType.trim(),
+          brand: brand.trim() || undefined,
+          model: model.trim() || undefined,
+          problem: selectedIssueTitle.trim(),
+          serviceCategory: serviceCategory.trim(),
+          serviceSlug: problem?.serviceSlug || 'laptop-repair',
+          serviceMode: 'shop_visit',
+          preferredDate: preferredDate,
+          preferredSlot: preferredSlot,
+          address: address.trim(),
+          notes: notes.trim() || undefined,
+          smsUpdates: smsUpdates,
+          emailUpdates: emailUpdates,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        setErrorMessage(data.error || 'Failed to submit booking. Please verify all required fields.');
-        setLoading(false);
+        setValidationError(data.error || 'Failed to submit repair booking. Please try again.');
+        setSubmitting(false);
+        modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       setConfirmedBooking({
         bookingCode: data.booking.bookingCode,
-        serviceName: data.booking.serviceName,
-        deviceType: data.booking.deviceType,
-        problem: data.booking.problem,
-        serviceMode: data.booking.serviceMode,
+        serviceName: data.booking.serviceName || serviceCategory,
+        deviceType: data.booking.deviceType || deviceType,
+        brand: data.booking.brand || brand,
+        model: data.booking.model || model,
+        problem: data.booking.problem || selectedIssueTitle,
+        preferredDate: preferredDate,
+        preferredSlot: preferredSlot,
       });
-      setLoading(false);
+
+      setIsConfirmed(true);
+      setSubmitting(false);
+      setTimeout(() => {
+        modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 50);
     } catch {
-      setErrorMessage('Network connection error. Please try again or call our hotline.');
-      setLoading(false);
+      setValidationError('Network connection error. Please check your internet or call our helpline.');
+      setSubmitting(false);
+      modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
+  // Determine if device photo should be desktop or laptop
+  const isDesktopSelected =
+    deviceType.toLowerCase().includes('desktop') ||
+    deviceType.toLowerCase().includes('pc') ||
+    deviceType.toLowerCase().includes('rig');
+
+  const previewDevicePhoto = isDesktopSelected
+    ? '/images/desktop-preview.jpg'
+    : '/images/laptop-preview.jpg';
+
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md p-2.5 sm:p-5 md:p-8 overscroll-contain animate-in fade-in duration-200"
+      ref={modalScrollRef}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-md p-2.5 sm:p-5 md:p-8 overscroll-contain animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="repair-booking-modal-title"
     >
-      {/* Centering Flex Wrapper: items-start ensures the top/header is NEVER pushed off-screen or clipped */}
-      <div className="min-h-full flex items-start sm:items-center justify-center py-4 sm:py-8">
-        
-        {/* Main Modal Card */}
+      <div className="min-h-full flex items-start sm:items-center justify-center py-2 sm:py-6">
+        {/* Main 3-Step Card */}
         <div
-          className="relative w-full max-w-4xl bg-white rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/30 overflow-hidden transform transition-all text-left"
+          className="relative w-full max-w-5xl bg-white rounded-3xl border border-slate-200/90 shadow-2xl shadow-blue-950/25 overflow-hidden text-left transition-all"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Top Sticky Navigation Bar */}
-          <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md px-5 sm:px-8 py-3.5 border-b border-slate-100 flex items-center justify-between shadow-2xs">
-            {/* Left: Prominent Back to Issues Button for high UX clarity */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 active:bg-slate-200 transition-all tap-target group"
-              title="Return to What issue is your device facing?"
-            >
-              <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:text-slate-900 group-hover:-translate-x-0.5 transition-all" />
-              <span>← Back to Issues</span>
-            </button>
+          {/* Subtle light blue background wave art behind header */}
+          <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-sky-50/90 via-blue-50/40 to-transparent pointer-events-none -z-0" />
 
-            {/* Center: Step Indicator */}
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-[#0284C7] bg-sky-50 border border-sky-200/80">
-              <span className="font-mono text-xs font-black">#</span>
-              <span>Step 2 of 2 • Diagnostic Booking Details</span>
+          {/* Modal Header */}
+          <div className="relative z-10 px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              {/* Blue Calendar/Booking Icon */}
+              <div className="w-12 h-12 rounded-2xl bg-blue-100/90 border border-blue-200/80 text-[#155EEF] flex items-center justify-center shrink-0 shadow-xs">
+                <Calendar className="w-6 h-6 stroke-[2.2]" />
+              </div>
+
+              <div>
+                <h2
+                  id="repair-booking-modal-title"
+                  className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight"
+                >
+                  Repair Booking Information
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                  {currentStep === 3
+                    ? 'Review and confirm your booking details'
+                    : 'Fill in the details below to book your repair service'}
+                </p>
+              </div>
             </div>
 
-            {/* Right: Close X Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors tap-target"
-              aria-label="Close modal"
-              title="Close (Esc)"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Header Right: Graphic Art + Close 'X' Button */}
+            <div className="flex items-center gap-4 self-end sm:self-auto">
+              {/* Laptop Graphic Art with floating repair tools */}
+              <div className="hidden md:block relative w-24 h-16 shrink-0">
+                <Image
+                  src="/images/header-repair-laptop.jpg"
+                  alt="Laptop repair illustration"
+                  fill
+                  sizes="96px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-9 h-9 rounded-full bg-white border border-slate-200/90 hover:border-slate-300 text-slate-400 hover:text-slate-700 flex items-center justify-center shadow-2xs hover:bg-slate-50 transition-all tap-target"
+                aria-label="Close modal"
+                title="Close (Esc)"
+              >
+                <X className="w-4 h-4 stroke-[2.4]" />
+              </button>
+            </div>
           </div>
 
-          {/* Modal Content Body */}
-          <div className="p-5 sm:p-8 md:p-9 space-y-6">
+          {/* Stepper Bar: Step 1 – Your Details | Step 2 – Appointment | Step 3 – Confirmation */}
+          <div className="relative z-10 px-6 sm:px-8 py-3.5 bg-slate-50/70 border-b border-slate-100">
+            <div className="flex items-center justify-start sm:justify-start gap-3 sm:gap-8 overflow-x-auto no-scrollbar">
+              {/* Step 1: Your Details */}
+              <div
+                className={`flex items-center gap-2 cursor-pointer transition-colors ${
+                  currentStep >= 1 ? 'text-[#155EEF] font-bold' : 'text-slate-400'
+                }`}
+                onClick={() => {
+                  if (!isConfirmed && currentStep > 1) setCurrentStep(1);
+                }}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    currentStep > 1 || (currentStep === 1 && isConfirmed)
+                      ? 'bg-[#155EEF] text-white'
+                      : currentStep === 1
+                      ? 'bg-[#155EEF] text-white ring-2 ring-[#155EEF]/20'
+                      : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
+                  {currentStep > 1 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '1'}
+                </div>
+                <div className="relative text-xs sm:text-sm">
+                  <span>Your Details</span>
+                  {currentStep === 1 && !isConfirmed && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#155EEF] rounded-full" />
+                  )}
+                </div>
+              </div>
+
+              {/* Connecting line 1 */}
+              <div className="w-8 sm:w-16 h-px bg-slate-200 shrink-0" />
+
+              {/* Step 2: Appointment */}
+              <div
+                className={`flex items-center gap-2 cursor-pointer transition-colors ${
+                  currentStep >= 2 ? 'text-[#155EEF] font-bold' : 'text-slate-400'
+                }`}
+                onClick={() => {
+                  if (!isConfirmed && currentStep === 3) setCurrentStep(2);
+                }}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    currentStep > 2 || (currentStep === 2 && isConfirmed)
+                      ? 'bg-[#155EEF] text-white'
+                      : currentStep === 2
+                      ? 'bg-[#155EEF] text-white ring-2 ring-[#155EEF]/20'
+                      : 'bg-slate-100 border border-slate-300 text-slate-500'
+                  }`}
+                >
+                  {currentStep > 2 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '2'}
+                </div>
+                <div className="relative text-xs sm:text-sm">
+                  <span>Appointment</span>
+                  {currentStep === 2 && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#155EEF] rounded-full" />
+                  )}
+                </div>
+              </div>
+
+              {/* Connecting line 2 */}
+              <div className="w-8 sm:w-16 h-px bg-slate-200 shrink-0" />
+
+              {/* Step 3: Confirmation */}
+              <div
+                className={`flex items-center gap-2 transition-colors ${
+                  currentStep === 3 ? 'text-[#155EEF] font-bold' : 'text-slate-400'
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    isConfirmed
+                      ? 'bg-[#155EEF] text-white ring-2 ring-[#155EEF]/20'
+                      : currentStep === 3
+                      ? 'bg-[#155EEF] text-white'
+                      : 'bg-slate-100 border border-slate-300 text-slate-500'
+                  }`}
+                >
+                  {isConfirmed ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : '3'}
+                </div>
+                <div className="relative text-xs sm:text-sm">
+                  <span>Confirmation</span>
+                  {currentStep === 3 && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#155EEF] rounded-full" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Validation Alert Message if any */}
+          {validationError && (
+            <div className="mx-6 sm:mx-8 mt-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in shake">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{validationError}</span>
+            </div>
+          )}
+
+          {/* Main 2-Column Body Grid */}
+          <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {confirmedBooking ? (
-              /* ================= Confirmation Receipt Screen ================= */
-              <div className="py-6 sm:py-10 text-center max-w-lg mx-auto space-y-6">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-sm animate-in zoom-in-75 duration-300">
-                  <Check className="w-10 h-10 stroke-[3]" />
-                </div>
+            {/* ======================================================== */}
+            {/* LEFT COLUMN: Main Form & Confirmation Details            */}
+            {/* ======================================================== */}
+            <div className={isConfirmed ? "col-span-1 lg:col-span-12 space-y-6" : "lg:col-span-7 xl:col-span-8 space-y-6"}>
+              
+              {/* ---------------------------------------------------- */}
+              {/* STEP 1: YOUR DETAILS (Device & Customer Information) */}
+              {/* ---------------------------------------------------- */}
+              {currentStep === 1 && (
+                <form onSubmit={handleProceedToAppointment} className="space-y-6">
+                  {/* Selected Issue Alert Callout Banner with Change Action */}
+                  <div className="bg-blue-50/70 border border-blue-200/90 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#155EEF] text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <div className="text-left text-xs sm:text-sm">
+                        <div className="font-bold text-slate-900">
+                          Selected Issue:{' '}
+                          <span className="text-[#155EEF] font-extrabold">
+                            {selectedIssueTitle}
+                          </span>
+                        </div>
+                        <div className="text-slate-600 text-xs mt-0.5">
+                          Service Category:{' '}
+                          <span className="font-semibold text-slate-800">
+                            {serviceCategory}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-1 rounded-full border border-emerald-200/80">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Diagnostic Booking Confirmed</span>
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-3">
-                    We Have Received Your Request!
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                    A certified technician will call you within <strong className="text-slate-900">15 minutes</strong> to confirm the appointment and arrange pickup/dispatch.
-                  </p>
-                </div>
-
-                {/* Booking Code Reference Box */}
-                <div className="bg-slate-50/90 rounded-2xl p-5 border border-slate-200 text-left space-y-3.5 shadow-2xs">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Booking Reference Code
-                    </span>
                     <button
                       type="button"
-                      onClick={() => handleCopyCode(confirmedBooking.bookingCode)}
-                      className="inline-flex items-center gap-1.5 font-mono text-lg font-black text-[#155EEF] hover:text-[#1048bc] transition-colors"
-                      title="Click to copy code"
+                      onClick={() => setIsChangingIssue(!isChangingIssue)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#155EEF] hover:text-[#1048bc] bg-white border border-blue-200/80 hover:bg-blue-50/60 shadow-2xs transition-all self-start sm:self-auto tap-target"
                     >
-                      <span>{confirmedBooking.bookingCode}</span>
-                      <Copy className="w-4 h-4 text-slate-400" />
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>{isChangingIssue ? 'Done' : 'Change'}</span>
                     </button>
                   </div>
-                  {copiedCode && (
-                    <div className="text-[11px] font-bold text-emerald-600 text-right -mt-2">
-                      ✓ Copied to clipboard!
+
+                  {/* Inline Issue Switcher Dropdown (when 'Change' is clicked) */}
+                  {isChangingIssue && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 animate-in fade-in duration-200">
+                      <span className="text-xs font-bold text-slate-700 block">
+                        Quickly select or type your device issue:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {PROBLEMS_DATA.map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedIssueTitle(p.title);
+                              setServiceCategory(p.category);
+                              setIsChangingIssue(false);
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                              selectedIssueTitle === p.title
+                                ? 'bg-[#155EEF] text-white shadow-xs'
+                                : 'bg-white text-slate-700 border border-slate-200 hover:border-blue-400'
+                            }`}
+                          >
+                            {p.title}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="pt-2">
+                        <input
+                          type="text"
+                          value={selectedIssueTitle}
+                          onChange={(e) => setSelectedIssueTitle(e.target.value)}
+                          placeholder="Or type custom issue description..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-base sm:text-sm text-slate-900 focus:border-[#155EEF] outline-none"
+                        />
+                      </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-slate-400 block font-medium">Reported Problem</span>
-                      <span className="font-semibold text-slate-800 line-clamp-1">
-                        {confirmedBooking.problem}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block font-medium">Service Mode</span>
-                      <span className="font-semibold text-slate-800 capitalize">
-                        {confirmedBooking.serviceMode.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                  <Link
-                    href={`/track-booking?code=${confirmedBooking.bookingCode}`}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-[#155EEF] hover:bg-[#1048bc] shadow-md shadow-blue-500/20 text-sm transition-all"
-                  >
-                    <span>Track Booking Live</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 text-sm transition-all"
-                  >
-                    Done & Close
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* ================= Booking Information Form ================= */
-              <form onSubmit={handleSubmit} className="space-y-6">
-                
-                {/* Header Title Section */}
-                <div className="space-y-1.5">
-                  <div className="sm:hidden inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#0284C7] bg-sky-50 border border-sky-200/90 mb-1">
-                    <span className="font-mono text-xs font-black">#</span>
-                    <span>{isFromCalculator ? 'Complete Your Repair Booking' : 'Step 2 • Diagnostic Booking Details'}</span>
-                  </div>
-
-                  <h2
-                    id="repair-booking-modal-title"
-                    className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight"
-                  >
-                    {isFromCalculator ? 'Complete Your Repair Booking' : 'Repair Booking Information'}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
-                    {isFromCalculator
-                      ? 'Your device and issue are already configured. Choose your preferred service mode and enter contact details to finalize.'
-                      : 'Review your selected issue, tell us your device model, and choose your preferred appointment time.'}
-                  </p>
-                </div>
-
-                {/* Pre-filled Notification Callout Banner */}
-                {isFromCalculator ? (
-                  <div className="bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50 border border-blue-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-                    <div className="flex items-start gap-3.5">
-                      <div className="w-10 h-10 rounded-2xl bg-[#155EEF] text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
-                        <Wrench className="w-5 h-5" />
-                      </div>
-                      <div className="space-y-0.5 text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#155EEF] bg-blue-100/80 px-2.5 py-0.5 rounded-full border border-blue-200">
-                            Configured from Calculator
-                          </span>
-                        </div>
-                        <div className="text-base font-extrabold text-slate-900 pt-0.5">
-                          {selectedBrand && selectedDevice
-                            ? `${selectedBrand} ${selectedDevice}`
-                            : problem?.title}
-                        </div>
-                        <div className="text-xs text-slate-600">
-                          {problem?.title && !problem.title.startsWith(`${selectedBrand} ${selectedDevice}`) && (
-                            <span className="font-semibold text-slate-800">{problem.title} • </span>
-                          )}
-                          {problem?.subtitle}
-                        </div>
-                      </div>
+                  {/* Section 1: Device & Service Details */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-900">
+                      <Monitor className="w-4 h-4 text-[#155EEF]" />
+                      <span>Device & Service Details</span>
                     </div>
 
-                    {estimateRange && (
-                      <div className="sm:text-right shrink-0 bg-white/90 backdrop-blur-xs px-4 py-2.5 rounded-2xl border border-blue-200/80 shadow-2xs">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                          Calculated Estimate
-                        </span>
-                        <span className="text-lg font-black text-emerald-600 block">
-                          {estimateRange}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="bg-sky-50/70 border border-sky-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
-                    <div className="w-6 h-6 rounded-full bg-sky-100 text-[#155EEF] flex items-center justify-center shrink-0 mt-0.5 border border-sky-200/60">
-                      <CheckCircle2 className="w-4 h-4 text-[#155EEF]" />
-                    </div>
-                    <div className="text-left text-xs sm:text-sm space-y-0.5">
-                      <div className="font-bold text-slate-900">
-                        Pre-filled from Selected Issue:{' '}
-                        <span className="text-[#155EEF] font-black">
-                          {problem?.title || 'Diagnostic Inspection'}
-                        </span>
-                      </div>
-                      <div className="text-slate-600">
-                        Service category: <span className="font-semibold text-slate-800">{problem?.category || 'Laptop Repair'}</span>. You can refine or add extra symptoms below.
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Error Alert if any */}
-                {errorMessage && (
-                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold animate-in shake">
-                    {errorMessage}
-                  </div>
-                )}
-
-                {/* Only render Device Type, Brand, Model and Symptoms if NOT from calculator */}
-                {!isFromCalculator && (
-                  <>
-                    {/* Grid Row 1: Device Type & Service Category */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Device Type Select */}
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Device Type *
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Device Type <span className="text-rose-500">*</span>
                         </label>
                         <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Laptop className="w-4 h-4" />
+                          </div>
                           <select
                             value={deviceType}
                             onChange={(e) => setDeviceType(e.target.value)}
                             required
-                            className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs pr-10"
+                            className="w-full appearance-none pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
                           >
-                            <option value="Laptop (Windows / Mac / Chromebook)">
-                              Laptop (Windows / Mac / Chromebook)
-                            </option>
-                            <option value="Desktop / All-in-One PC">Desktop / All-in-One PC</option>
-                            <option value="Custom Gaming Rig / Workstation">
-                              Custom Gaming Rig / Workstation
-                            </option>
-                            <option value="MacBook / iMac">MacBook / iMac</option>
+                            {DEVICE_OPTIONS.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
                           </select>
-                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
                       </div>
 
+                      {/* Service Category Select */}
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Service Category *
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Service Category <span className="text-rose-500">*</span>
                         </label>
                         <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Wrench className="w-4 h-4" />
+                          </div>
                           <select
-                            value={serviceSlug}
-                            onChange={(e) => setServiceSlug(e.target.value)}
+                            value={serviceCategory}
+                            onChange={(e) => setServiceCategory(e.target.value)}
                             required
-                            className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs pr-10"
+                            className="w-full appearance-none pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
                           >
-                            {activeServices.map((s) => (
-                              <option key={s.id} value={s.slug}>
-                                {s.name}
+                            {SERVICE_CATEGORY_OPTIONS.map((cat) => (
+                              <option key={cat} value={cat}>
+                                {cat}
                               </option>
                             ))}
                           </select>
-                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      {/* Brand / Manufacturer Input */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Brand / Manufacturer <span className="text-slate-400 font-normal">(Optional)</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Tag className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="text"
+                            value={brand}
+                            onChange={(e) => setBrand(e.target.value)}
+                            placeholder="e.g. Dell, HP, Lenovo, Asus"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Model Number / Series Input */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Model Number / Series <span className="text-slate-400 font-normal">(Optional)</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Barcode className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="text"
+                            value={model}
+                            onChange={(e) => setModel(e.target.value)}
+                            placeholder="e.g. Inspiron 15 3511, MacBook Pro M1"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Grid Row 2: Brand & Model Number */}
+                  {/* Section 2: Customer Information */}
+                  <div className="space-y-4 pt-2">
+                    <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-900">
+                      <User className="w-4 h-4 text-[#155EEF]" />
+                      <span>Customer Information</span>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Full Name */}
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Brand / Manufacturer <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Full Name <span className="text-rose-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          value={brand}
-                          onChange={(e) => setBrand(e.target.value)}
-                          placeholder="e.g. Dell, Apple, HP, Lenovo, Asus"
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
-                        />
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <User className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            placeholder="Your Name"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                        </div>
                       </div>
 
+                      {/* Phone Number */}
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Model Number / Series
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Phone Number <span className="text-rose-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          value={model}
-                          onChange={(e) => setModel(e.target.value)}
-                          placeholder='e.g. Inspiron 15 3511, MacBook Pro M1 14"'
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
-                        />
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Phone className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="tel"
+                            value={mobile}
+                            onChange={(e) => setMobile(e.target.value)}
+                            required
+                            placeholder="Your Number"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Email Address */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Email Address <span className="text-slate-400 font-normal">(Optional)</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Mail className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="example@mail.com"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Address */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Address <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <MapPin className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                            placeholder="Dasturhat, Murshidabad, West Bengal"
+                            className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#155EEF] pointer-events-none">
+                            <MapPin className="w-4 h-4" />
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Grid Row 3: Problem Description / Symptoms */}
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                        Problem Description / Symptoms *
-                      </label>
-                      <textarea
-                        value={problemText}
-                        onChange={(e) => setProblemText(e.target.value)}
-                        required={!isFromCalculator}
-                        rows={3}
-                        placeholder="Describe your device symptom or what occurred prior to the issue..."
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs leading-relaxed"
+                  {/* Terms & Conditions Checkbox */}
+                  <div className="pt-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-700 select-none">
+                      <input
+                        type="checkbox"
+                        checked={agreeTerms}
+                        onChange={(e) => setAgreeTerms(e.target.checked)}
+                        className="w-4 h-4 mt-0.5 rounded text-[#155EEF] border-slate-300 focus:ring-[#155EEF]"
                       />
-                    </div>
-                  </>
-                )}
-
-                {/* Grid Row 4: Choose How You Want To Service (3 Cards matching mockup) */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                    Choose How You Want To Service *
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {/* Option 1: Workshop Drop-in */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setServiceMode('shop_visit')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') setServiceMode('shop_visit');
-                      }}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between tap-target ${
-                        serviceMode === 'shop_visit'
-                          ? 'border-2 border-[#155EEF] bg-blue-50/30 ring-2 ring-[#155EEF]/10 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 mb-2">
-                        <div className="w-8 h-8 rounded-xl bg-sky-50 text-[#155EEF] border border-sky-100 flex items-center justify-center shrink-0">
-                          <Building2 className="w-4 h-4" />
-                        </div>
-                        <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                          Workshop Drop-in
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Bring directly to our central lab. Free on-the-spot triage.
-                      </p>
-                    </div>
-
-                    {/* Option 2: Courier Doorstep Pickup */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setServiceMode('home_pickup')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') setServiceMode('home_pickup');
-                      }}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between tap-target ${
-                        serviceMode === 'home_pickup'
-                          ? 'border-2 border-[#155EEF] bg-blue-50/30 ring-2 ring-[#155EEF]/10 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 mb-2">
-                        <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
-                          <Truck className="w-4 h-4" />
-                        </div>
-                        <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                          Courier Doorstep Pickup
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Safe boxed courier collection from your residence or office.
-                      </p>
-                    </div>
-
-                    {/* Option 3: On-Site Tech Visit */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setServiceMode('on_site')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') setServiceMode('on_site');
-                      }}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between tap-target ${
-                        serviceMode === 'on_site'
-                          ? 'border-2 border-[#155EEF] bg-blue-50/30 ring-2 ring-[#155EEF]/10 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 mb-2">
-                        <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
-                          <UserCheck className="w-4 h-4" />
-                        </div>
-                        <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                          On-Site Tech Visit
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 leading-snug">
-                        Certified field engineer visits for software & Wi-Fi issues.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conditional Address & Area inputs when Pickup or On-Site is chosen */}
-                {serviceMode !== 'shop_visit' && (
-                  <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-3.5 animate-in fade-in duration-200">
-                    <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-[#155EEF]" />
-                      <span>Doorstep Pickup / Visit Address in Kolkata</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      <div className="sm:col-span-2">
-                        <input
-                          type="text"
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          required
-                          placeholder="House / Flat No., Apartment/Office Building, Street, Landmark"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#155EEF] outline-none shadow-2xs"
-                        />
-                      </div>
-                      {serviceAreas && serviceAreas.length > 0 && (
-                        <div className="sm:col-span-2 relative">
-                          <select
-                            value={areaSlug}
-                            onChange={(e) => setAreaSlug(e.target.value)}
-                            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 shadow-2xs pr-10"
-                          >
-                            <option value="">Select Kolkata Region (Optional)</option>
-                            {serviceAreas.map((area) => (
-                              <option key={area.id} value={area.slug}>
-                                {area.name} (Pincodes: {area.pincodes})
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Grid Row 5: Preferred Date & Preferred Time Window */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Preferred Date
+                      <span>
+                        I agree to the{' '}
+                        <Link href="/terms" target="_blank" className="text-[#155EEF] underline hover:text-blue-700">
+                          terms and conditions
+                        </Link>{' '}
+                        and our{' '}
+                        <Link href="/privacy-policy" target="_blank" className="text-[#155EEF] underline hover:text-blue-700">
+                          service policy
+                        </Link>
+                        .
+                      </span>
                     </label>
-                    <input
-                      type="date"
-                      min={todayDateString}
-                      value={preferredDate}
-                      onChange={(e) => setPreferredDate(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
-                    />
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Preferred Time Window
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={preferredSlot}
-                        onChange={(e) => setPreferredSlot(e.target.value)}
-                        className="w-full appearance-none px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs pr-10"
-                      >
-                        <option value="Morning (9:00 AM - 1:00 PM)">Morning (9:00 AM - 1:00 PM)</option>
-                        <option value="Afternoon (1:00 PM - 5:00 PM)">Afternoon (1:00 PM - 5:00 PM)</option>
-                        <option value="Evening (5:00 PM - 8:30 PM)">Evening (5:00 PM - 8:30 PM)</option>
-                      </select>
-                      <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  {/* Step 1 Actions */}
+                  {validationError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in shake">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span>{validationError}</span>
                     </div>
-                  </div>
-                </div>
+                  )}
 
-                {/* Grid Row 6: Your Contact Details */}
-                <div className="space-y-3 pt-2">
-                  <div className="text-xs sm:text-sm font-bold text-slate-900">
-                    Your Contact Details
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        placeholder="e.g. Ramesh Kumar"
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                        Mobile Number *
-                      </label>
-                      <input
-                        type="tel"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value)}
-                        required
-                        placeholder="e.g. +91 98765 43210"
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                        Email Address (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="e.g. ramesh@example.com"
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none shadow-2xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Action Row: Security Note + Submit CTA + Back Button */}
-                <div className="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                    <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span>No upfront payment required. Written estimate provided after inspection.</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    {/* Secondary Bottom Back Button */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-1/3 sm:w-auto px-5 py-3 rounded-xl font-bold text-xs sm:text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors tap-target"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all tap-target cursor-pointer"
                     >
-                      Back
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
                     </button>
 
-                    {/* Primary Confirm & Book Button */}
                     <button
                       type="submit"
-                      disabled={loading}
-                      className="w-2/3 sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3894] transition-all shadow-md shadow-blue-500/20 disabled:opacity-70 tap-target"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3894] shadow-md shadow-blue-500/20 transition-all tap-target cursor-pointer touch-manipulation"
                     >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Confirming Booking...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 rotate-45 -mt-0.5" />
-                          <span>
-                            {isFromCalculator
-                              ? 'Book Repair with this Estimate'
-                              : 'Confirm & Book Diagnostic Repair'}
-                          </span>
-                        </>
-                      )}
+                      <span>Continue to Appointment</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
+                </form>
+              )}
+
+              {/* ---------------------------------------------------- */}
+              {/* STEP 2: APPOINTMENT (Date, Time Slot, Preferences)   */}
+              {/* ---------------------------------------------------- */}
+              {currentStep === 2 && (
+                <form onSubmit={handleProceedToConfirmation} className="space-y-6">
+                  {/* Section: Select Appointment */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-900">
+                      <Calendar className="w-4 h-4 text-[#155EEF]" />
+                      <span>Select Appointment</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Preferred Date */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Preferred Date <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="date"
+                            min={todayMinDate}
+                            value={preferredDate}
+                            onChange={(e) => setPreferredDate(e.target.value)}
+                            required
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          />
+                        </div>
+                        {checkingAvailability && (
+                          <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin text-[#155EEF]" />
+                            <span>Checking shop schedule...</span>
+                          </div>
+                        )}
+                        {availabilityWarning && (
+                          <div className="text-[11px] text-rose-600 font-semibold mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                            <span>{availabilityWarning}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Preferred Time Slot */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          Preferred Time Slot <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <Clock className="w-4 h-4" />
+                          </div>
+                          <select
+                            value={preferredSlot}
+                            onChange={(e) => setPreferredSlot(e.target.value)}
+                            required
+                            className="w-full appearance-none pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs"
+                          >
+                            {TIME_SLOTS.map((slot) => (
+                              <option key={slot} value={slot}>
+                                {slot}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Notes (Optional) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-bold text-slate-700">
+                          Additional Notes <span className="text-slate-400 font-normal">(Optional)</span>
+                        </label>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          {notes.length} / 500
+                        </span>
+                      </div>
+                      <textarea
+                        value={notes}
+                        maxLength={500}
+                        onChange={(e) => setNotes(e.target.value)}
+                        rows={4}
+                        placeholder="Any specific instructions or problem details..."
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-base sm:text-sm font-medium focus:border-[#155EEF] focus:ring-3 focus:ring-[#155EEF]/10 outline-none transition-all shadow-2xs resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section: Service Preferences */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-slate-900">
+                      <Bell className="w-4 h-4 text-[#155EEF]" />
+                      <span>Service Preferences</span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-700 select-none">
+                        <input
+                          type="checkbox"
+                          checked={smsUpdates}
+                          onChange={(e) => setSmsUpdates(e.target.checked)}
+                          className="w-4 h-4 rounded text-[#155EEF] border-slate-300 focus:ring-[#155EEF]"
+                        />
+                        <span>I want to receive SMS updates</span>
+                        <span title="Get real-time SMS status updates when your technician is assigned.">
+                          <Info className="w-3.5 h-3.5 text-slate-400" />
+                        </span>
+                      </label>
+
+                      <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-700 select-none">
+                        <input
+                          type="checkbox"
+                          checked={emailUpdates}
+                          onChange={(e) => setEmailUpdates(e.target.checked)}
+                          className="w-4 h-4 rounded text-[#155EEF] border-slate-300 focus:ring-[#155EEF]"
+                        />
+                        <span>I want to receive email updates</span>
+                        <span title="Receive itemized diagnostic reports and invoices via email.">
+                          <Info className="w-3.5 h-3.5 text-slate-400" />
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Step 2 Actions */}
+                  {validationError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in shake">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span>{validationError}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentStep(1);
+                        setTimeout(() => modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                      }}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all tap-target cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={Boolean(availabilityWarning)}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3894] disabled:opacity-50 shadow-md shadow-blue-500/20 transition-all tap-target cursor-pointer touch-manipulation"
+                    >
+                      <span>Continue to Confirmation</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* ---------------------------------------------------- */}
+              {/* STEP 3: CONFIRMATION (Review & Confirmed Screen)     */}
+              {/* ---------------------------------------------------- */}
+              {currentStep === 3 && (
+                <div>
+                  {!isConfirmed ? (
+                    /* Review Screen before final confirmation */
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900">
+                          Please Review Your Booking Details
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                          Verify the information below before creating your service appointment.
+                        </p>
+                      </div>
+
+                      {/* Summary Review Cards */}
+                      <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/90 space-y-4 text-xs sm:text-sm">
+                        {/* Customer Row */}
+                        <div className="flex items-start justify-between pb-3 border-b border-slate-200">
+                          <div>
+                            <span className="text-slate-400 font-medium block">Customer</span>
+                            <span className="font-bold text-slate-900">{name}</span>
+                            <span className="text-slate-500 block">{mobile}</span>
+                            {email && <span className="text-slate-500 block">{email}</span>}
+                          </div>
+                          <div className="text-right max-w-xs">
+                            <span className="text-slate-400 font-medium block">Service Address</span>
+                            <span className="font-medium text-slate-800">{address}</span>
+                          </div>
+                        </div>
+
+                        {/* Appointment Row */}
+                        <div className="flex items-start justify-between pb-3 border-b border-slate-200">
+                          <div>
+                            <span className="text-slate-400 font-medium block">Appointment Date</span>
+                            <span className="font-bold text-[#155EEF]">
+                              {formatDisplayDate(preferredDate)}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-slate-400 font-medium block">Time Slot</span>
+                            <span className="font-bold text-slate-900">{preferredSlot}</span>
+                          </div>
+                        </div>
+
+                        {/* Device & Issue Row */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <span className="text-slate-400 font-medium block">Device</span>
+                            <span className="font-semibold text-slate-800">
+                              {deviceType} {brand ? `• ${brand}` : ''} {model ? `(${model})` : ''}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 font-medium block">Reported Problem</span>
+                            <span className="font-semibold text-slate-800">
+                              {selectedIssueTitle}
+                            </span>
+                          </div>
+                        </div>
+
+                        {notes && (
+                          <div className="pt-2 border-t border-slate-200">
+                            <span className="text-slate-400 font-medium block">Notes:</span>
+                            <span className="text-slate-700 italic">&ldquo;{notes}&rdquo;</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      {validationError && (
+                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in shake">
+                          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                          <span>{validationError}</span>
+                        </div>
+                      )}
+
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentStep(2);
+                            setTimeout(() => modalScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                          }}
+                          disabled={submitting}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all tap-target cursor-pointer"
+                        >
+                          <ArrowLeft className="w-4 h-4" />
+                          <span>Back to Appointment</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleFinalConfirmBooking}
+                          disabled={submitting}
+                          className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#155EEF] hover:bg-[#1048bc] active:bg-[#0c3894] shadow-md shadow-blue-500/20 disabled:opacity-60 transition-all tap-target cursor-pointer touch-manipulation"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Creating Booking...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-4 h-4" />
+                              <span>Confirm & Book Diagnostic</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Booking Confirmed Success Screen (matches Image 2 right side) */
+                    <div className="py-2 text-center space-y-6 animate-in zoom-in-95 duration-300">
+                      {/* Big Green Checkmark with Confetti Dots */}
+                      <div className="relative inline-flex items-center justify-center">
+                        {/* Colorful Festive Confetti dots */}
+                        <span className="absolute -top-3 -left-4 w-2 h-2 rounded-full bg-rose-400 animate-bounce" />
+                        <span className="absolute -top-2 right-6 w-2.5 h-2.5 rounded-full bg-amber-400" />
+                        <span className="absolute top-2 -right-5 w-2 h-2 rounded-full bg-blue-400" />
+                        <span className="absolute -bottom-2 -left-6 w-2.5 h-2.5 rounded-full bg-purple-400" />
+                        <span className="absolute -bottom-3 right-5 w-2 h-2 rounded-full bg-emerald-400" />
+                        <span className="absolute top-6 -left-7 w-2 h-2 rounded-full bg-indigo-400" />
+
+                        {/* Central Green Check Badge */}
+                        <div className="w-20 h-20 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                          <Check className="w-10 h-10 stroke-[3.2]" />
+                        </div>
+                      </div>
+
+                      {/* Headline & Subtitle */}
+                      <div>
+                        <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
+                          Booking Confirmed!
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
+                          Your repair booking has been successfully created. We will contact you shortly to confirm your appointment.
+                        </p>
+                      </div>
+
+                      {/* Booking Reference No. Card */}
+                      <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 sm:p-5 max-w-md mx-auto text-center space-y-1 shadow-2xs">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                          Booking Reference No.
+                        </span>
+                        <div className="flex items-center justify-center gap-2 pt-0.5">
+                          <span className="font-mono text-xl sm:text-2xl font-black text-slate-900 tracking-wider">
+                            {confirmedBooking?.bookingCode || 'HVAC-2026-1123'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(confirmedBooking?.bookingCode || '')}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-[#155EEF] hover:bg-white transition-colors"
+                            title="Copy code"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {copiedCode && (
+                          <div className="text-[11px] font-bold text-emerald-600 pt-0.5 animate-in fade-in">
+                            ✓ Copied to clipboard!
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Two Details Rows: Appointment Details & Service Details */}
+                      <div className="space-y-4 max-w-lg mx-auto text-left text-xs sm:text-sm">
+                        {/* Appointment Details */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-slate-900">
+                            <Calendar className="w-4 h-4 text-[#155EEF]" />
+                            <span>Appointment Details</span>
+                          </div>
+                          <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Date</span>
+                              <span className="font-semibold text-slate-800">
+                                {formatDisplayDate(preferredDate)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Time Slot</span>
+                              <span className="font-semibold text-slate-800">
+                                {preferredSlot}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Service Details */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-slate-900">
+                            <Wrench className="w-4 h-4 text-[#155EEF]" />
+                            <span>Service Details</span>
+                          </div>
+                          <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Issue</span>
+                              <span className="font-semibold text-slate-800">
+                                {confirmedBooking?.problem || selectedIssueTitle}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Service Category</span>
+                              <span className="font-semibold text-slate-800">
+                                {serviceCategory}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Device Type</span>
+                              <span className="font-semibold text-slate-800">
+                                {deviceType}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bottom Action Buttons: Go to Home & View My Bookings */}
+                      <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <Link
+                          href="/"
+                          onClick={onClose}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all tap-target"
+                        >
+                          <Home className="w-4 h-4 text-slate-500" />
+                          <span>Go to Home</span>
+                        </Link>
+
+                        <Link
+                          href={`/track-booking?q=${encodeURIComponent(confirmedBooking?.bookingCode || '')}`}
+                          onClick={onClose}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#155EEF] hover:bg-[#1048bc] shadow-md shadow-blue-500/20 transition-all tap-target"
+                        >
+                          <Calendar className="w-4 h-4" />
+                          <span>View My Bookings</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ======================================================== */}
+            {/* RIGHT COLUMN: Dynamic Booking Summary Column             */}
+            {/* ======================================================== */}
+            {!isConfirmed && (
+            <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+                
+                {/* 1. Header: Dark blue bar with document icon */}
+                <div className="bg-[#0047AB] px-5 py-3 text-white flex items-center gap-2.5">
+                  <FileText className="w-4 h-4 text-white" />
+                  <span className="font-bold text-sm tracking-wide">
+                    Booking Summary
+                  </span>
                 </div>
 
-              </form>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* 2. Device Photo: dynamically shows laptop or desktop photo */}
+                  <div className="relative w-full h-36 bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 flex items-center justify-center p-2">
+                    <Image
+                      src={previewDevicePhoto}
+                      alt={deviceType}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 360px"
+                      className="object-contain transition-all duration-300 transform hover:scale-105"
+                    />
+                  </div>
+
+                  {/* 3. Dynamic Data Table: updates in real time as user types/selects */}
+                  <div className="space-y-2 text-xs border-b border-slate-100 pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-400 font-medium">Issue</span>
+                      <span className="font-bold text-slate-800 text-right line-clamp-1">
+                        {selectedIssueTitle}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-400 font-medium">Service Category</span>
+                      <span className="font-bold text-slate-800 text-right line-clamp-1">
+                        {serviceCategory}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-400 font-medium">Device Type</span>
+                      <span className="font-bold text-slate-800 text-right">
+                        {deviceType}
+                      </span>
+                    </div>
+
+                    {brand && (
+                      <div className="flex items-center justify-between gap-2 animate-in fade-in">
+                        <span className="text-slate-400 font-medium">Brand</span>
+                        <span className="font-bold text-slate-800 text-right">
+                          {brand}
+                        </span>
+                      </div>
+                    )}
+
+                    {model && (
+                      <div className="flex items-center justify-between gap-2 animate-in fade-in">
+                        <span className="text-slate-400 font-medium">Model / Series</span>
+                        <span className="font-bold text-slate-800 text-right line-clamp-1">
+                          {model}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. Step-specific content below dynamic data */}
+                  
+                  {/* Step 1 or Step 3: Trust Badges list */}
+                  {(currentStep === 1 || currentStep === 3) && (
+                    <div className="space-y-2.5 text-xs text-slate-600">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                          <Zap className="w-3 h-3 fill-amber-500" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block leading-tight">Quick Service</span>
+                          <span className="text-[11px] text-slate-400 leading-none">Get your device fixed quickly</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-blue-100 text-[#155EEF] flex items-center justify-center shrink-0">
+                          <ShieldCheck className="w-3 h-3" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block leading-tight">Verified Technicians</span>
+                          <span className="text-[11px] text-slate-400 leading-none">Skilled & background verified experts</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                          <Tag className="w-3 h-3" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block leading-tight">Transparent Pricing</span>
+                          <span className="text-[11px] text-slate-400 leading-none">No hidden charges</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0">
+                          <Shield className="w-3 h-3" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block leading-tight">Workmanship Warranty</span>
+                          <span className="text-[11px] text-slate-400 leading-none">On repairs and parts</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Progress Status indicators (matching Image 2) */}
+                  {currentStep === 2 && (
+                    <div className="space-y-2.5 text-xs py-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                          <span className="font-bold text-slate-800">Service Details</span>
+                        </div>
+                        <span className="text-[11px] text-emerald-600 font-semibold">Provided</span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-[#155EEF] text-white flex items-center justify-center shrink-0">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                          <span className="font-bold text-slate-800">Appointment</span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          {preferredDate ? formatDisplayDate(preferredDate) : 'Not Selected'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 text-[10px] font-bold">
+                            3
+                          </div>
+                          <span className="font-medium text-slate-500">Confirmation</span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-medium">Pending</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 1: Green Card "No Advance Payment" */}
+                  {currentStep === 1 && (
+                    <div className="bg-emerald-50/90 border border-emerald-200/90 rounded-2xl p-3 flex items-center gap-2.5 text-xs">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-900 block leading-tight">No Advance Payment</span>
+                        <span className="text-[11px] text-slate-500 leading-none">Pay only after service</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 Confirmed: Green Thank You Card (matching Image 2) */}
+                  {currentStep === 3 && isConfirmed && (
+                    <div className="bg-emerald-50/90 border border-emerald-200/90 rounded-2xl p-3.5 flex items-center gap-2.5 text-xs">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <div className="font-bold text-emerald-900">
+                        Thank you for choosing {companyName}!
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Need Help Card (present on Step 1 and Step 2) */}
+                  {(!isConfirmed || currentStep !== 3) && (
+                    <div className="bg-sky-50/70 border border-sky-100 rounded-2xl p-3 flex items-center gap-2.5 text-xs">
+                      <div className="w-8 h-8 rounded-xl bg-sky-100 text-[#155EEF] flex items-center justify-center shrink-0">
+                        <Headphones className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-900 block leading-tight">Need Help?</span>
+                        <a
+                          href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
+                          className="text-[11px] text-[#155EEF] font-semibold hover:underline leading-none"
+                        >
+                          Call us: {phone}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             )}
 
           </div>

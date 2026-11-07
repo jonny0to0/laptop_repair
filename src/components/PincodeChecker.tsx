@@ -68,7 +68,7 @@ export default function PincodeChecker({ areas }: PincodeCheckerProps) {
               if (result.searched) setResult({ searched: false, covered: false });
             }}
             placeholder="e.g. 110001 or Downtown"
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
         <button

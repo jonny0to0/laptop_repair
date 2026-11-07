@@ -33,20 +33,20 @@ export default function DashboardRecentJobs({ initialBookings }: DashboardRecent
 
   return (
     <>
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl transition-colors duration-150">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <CalendarCheck className="w-4 h-4 text-sky-400" />
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <CalendarCheck className="w-4 h-4 text-sky-500 dark:text-sky-400" />
               <span>Recent Repair Jobs</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Latest customer bookings received • Click Manage to view & update ticket in-place
             </p>
           </div>
           <Link
             href="/admin/bookings"
-            className="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1 group"
+            className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 font-medium flex items-center gap-1 group"
           >
             <span>All Bookings</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -55,21 +55,21 @@ export default function DashboardRecentJobs({ initialBookings }: DashboardRecent
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-950/70 text-slate-600 dark:text-slate-400 uppercase tracking-wider text-xs border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="px-5 py-3 font-semibold">Booking ID</th>
-                <th className="px-5 py-3 font-semibold">Customer</th>
-                <th className="px-5 py-3 font-semibold">Service</th>
-                <th className="px-5 py-3 font-semibold">Mode</th>
-                <th className="px-5 py-3 font-semibold">Status</th>
-                <th className="px-5 py-3 font-semibold">Created</th>
-                <th className="px-5 py-3 font-semibold text-right">Action</th>
+                <th className="px-5 py-3.5 font-bold">Booking ID</th>
+                <th className="px-5 py-3.5 font-bold">Customer</th>
+                <th className="px-5 py-3.5 font-bold">Service</th>
+                <th className="px-5 py-3.5 font-bold">Mode</th>
+                <th className="px-5 py-3.5 font-bold">Status</th>
+                <th className="px-5 py-3.5 font-bold">Created</th>
+                <th className="px-5 py-3.5 font-bold text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-500">
+                  <td colSpan={7} className="px-5 py-8 text-center text-slate-500 text-sm">
                     No bookings recorded yet. New requests from the public booking wizard will appear here automatically.
                   </td>
                 </tr>
@@ -79,51 +79,51 @@ export default function DashboardRecentJobs({ initialBookings }: DashboardRecent
                   return (
                     <tr
                       key={b.id}
-                      className="hover:bg-slate-800/40 transition-colors cursor-pointer group"
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group"
                       onClick={() => handleOpenManage(b)}
                     >
-                      <td className="px-5 py-3.5 font-mono font-bold text-sky-400">
+                      <td className="px-5 py-4 font-mono font-bold text-xs text-sky-700 dark:text-sky-400">
                         {b.bookingCode}
                       </td>
-                      <td className="px-5 py-3.5">
-                        <div className="font-semibold text-white group-hover:text-sky-300 transition-colors">
+                      <td className="px-5 py-4">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-300 transition-colors">
                           {b.customer.name}
                         </div>
-                        <div className="text-[11px] text-slate-400 font-mono">{b.customer.mobile}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{b.customer.mobile}</div>
                       </td>
-                      <td className="px-5 py-3.5">
-                        <div className="text-slate-200 font-medium">{b.service.name}</div>
-                        <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                          <Laptop className="w-3 h-3 text-slate-500" />
+                      <td className="px-5 py-4">
+                        <div className="text-sm text-slate-800 dark:text-slate-200 font-medium">{b.service.name}</div>
+                        <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          <Laptop className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                           <span>
                             {b.brand ? `${b.brand} ` : ''}
                             {b.deviceType}
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 text-slate-400 capitalize">
+                      <td className="px-5 py-4 text-xs font-semibold text-slate-700 dark:text-slate-300 capitalize">
                         {formatServiceModeLabel(b.serviceMode)}
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-5 py-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusConf.badgeClass}`}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusConf.badgeClass}`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${statusConf.dotColor}`} />
                           {statusConf.label}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 text-slate-400 font-medium">
+                      <td className="px-5 py-4 text-xs text-slate-600 dark:text-slate-400 font-medium">
                         {new Date(b.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
                         })}
                       </td>
-                      <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
                           onClick={() => handleOpenManage(b)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-slate-200 transition-all border border-slate-700 hover:border-transparent cursor-pointer shadow-xs"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 min-h-[32px] rounded-xl text-xs font-semibold bg-slate-100 hover:bg-sky-500 hover:text-white text-slate-700 border border-slate-200 hover:border-transparent dark:bg-slate-800 dark:hover:bg-sky-500 dark:hover:text-slate-950 dark:text-slate-200 dark:border-slate-700 dark:hover:border-transparent cursor-pointer shadow-2xs transition-all"
                           title="Open Ticket Management Modal"
                         >
                           <span>Manage</span>

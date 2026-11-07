@@ -183,15 +183,14 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <MapPin className="w-6 h-6 text-sky-400" />
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <MapPin className="w-6 h-6 text-sky-500 dark:text-sky-400" />
             <span>Service Areas & Pincode Coverage</span>
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
             Configure doorstep technician delivery zones and supported Kolkata postal codes.
           </p>
         </div>
@@ -199,7 +198,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sky-500 hover:bg-sky-400 text-white dark:text-slate-950 transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Add Service Area</span>
@@ -207,15 +206,15 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
       </div>
 
       {/* Search */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5">
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm dark:shadow-none transition-colors duration-150">
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search zones by name (e.g. Salt Lake, New Town) or pincode (e.g. 700091)..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
           />
         </div>
       </div>
@@ -228,13 +227,15 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
           return (
             <div
               key={a.id}
-              className={`bg-slate-900 border rounded-3xl p-5 flex flex-col justify-between transition-all ${
-                a.isActive ? 'border-slate-800 hover:border-slate-700' : 'border-slate-800/50 opacity-60'
+              className={`bg-white dark:bg-slate-900 border rounded-3xl p-5 flex flex-col justify-between shadow-sm dark:shadow-none transition-all ${
+                a.isActive
+                  ? 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                  : 'border-slate-200/60 dark:border-slate-800/50 opacity-60'
               }`}
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
+                  <span className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold border border-sky-100 dark:border-sky-500/20">
                     <MapPin className="w-4.5 h-4.5" />
                   </span>
 
@@ -242,37 +243,37 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                     <button
                       type="button"
                       onClick={() => handleToggleActive(a)}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase transition-colors ${
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase transition-colors ${
                         a.isActive
-                          ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
-                          : 'bg-rose-950/60 text-rose-300 border border-rose-800/50'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/50'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/50'
                       }`}
                     >
                       {a.isActive ? 'Active Zone' : 'Disabled'}
                     </button>
-                    <span className="text-xs font-mono text-slate-500">#{a.sortOrder}</span>
+                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500">#{a.sortOrder}</span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold text-white">{a.name}</h3>
-                  <span className="text-[11px] font-mono text-sky-400/80 block">/service-areas/{a.slug}</span>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{a.name}</h3>
+                  <span className="text-xs font-mono text-sky-600 dark:text-sky-400 block mt-0.5">/service-areas/{a.slug}</span>
                 </div>
 
                 {a.description && (
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
                     {a.description}
                   </p>
                 )}
 
                 {/* Covered Pincodes */}
-                <div className="pt-2 border-t border-slate-800 space-y-1.5">
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Covered Pincodes:</div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+                  <div className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">Covered Pincodes:</div>
                   <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                     {pincodeList.map((pin) => (
                       <span
                         key={pin}
-                        className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[11px] font-mono text-sky-300"
+                        className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-sky-700 dark:text-sky-300"
                       >
                         {pin}
                       </span>
@@ -280,16 +281,16 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-500 pt-1">
+                <div className="text-xs text-slate-500 dark:text-slate-400 pt-1">
                   {a._count.bookings} total repair bookings in this area
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                 <Link
                   href={`/service-areas/${a.slug}`}
                   target="_blank"
-                  className="text-xs text-slate-400 hover:text-sky-400 flex items-center gap-1 transition-colors"
+                  className="text-xs text-slate-600 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 flex items-center gap-1 transition-colors font-medium"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Public View</span>
@@ -299,7 +300,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(a)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition-colors"
+                    className="px-3.5 py-1.5 min-h-[32px] rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors border border-slate-200 dark:border-transparent"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                     <span>Edit</span>
@@ -308,7 +309,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                   <button
                     type="button"
                     onClick={() => handleDelete(a)}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 transition-colors"
+                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950 dark:text-slate-400 dark:hover:text-rose-400 flex items-center justify-center transition-colors border border-slate-200 dark:border-transparent"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -323,16 +324,16 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
       {/* Create / Edit Area Modal */}
       {(isCreatingNew || editingArea) && (
         <div
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 bg-black/50 dark:bg-black/75 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center animate-in fade-in duration-150"
           role="dialog"
           aria-modal="true"
         >
           <div
-            className="relative w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-left overflow-hidden my-6"
+            className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl text-left overflow-hidden my-6 transition-colors duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-slate-900/95 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-              <h2 className="text-base font-bold text-white">
+            <div className="bg-white/95 dark:bg-slate-900/95 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 {isCreatingNew ? 'Add Service Area' : `Edit: ${editingArea?.name}`}
               </h2>
               <button
@@ -341,7 +342,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                   setIsCreatingNew(false);
                   setEditingArea(null);
                 }}
-                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center"
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -349,7 +350,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {errorMsg && (
-                <div className="p-3 bg-rose-950/50 border border-rose-800 text-rose-300 text-xs rounded-xl flex items-center gap-2">
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300 text-xs rounded-xl flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
@@ -357,32 +358,32 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">Area Name *</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Area Name *</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                     placeholder="e.g. Salt Lake (Bidhannagar)"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">Slug *</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Slug *</label>
                   <input
                     type="text"
                     required
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="e.g. salt-lake"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-sky-400 focus:outline-none focus:border-sky-500"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-sky-600 dark:text-sky-400 focus:outline-none focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
                   Supported Pincodes (Comma separated) *
                 </label>
                 <textarea
@@ -391,37 +392,37 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                   value={formData.pincodes}
                   onChange={(e) => setFormData({ ...formData, pincodes: e.target.value })}
                   placeholder="e.g. 700064, 700091, 700097, 700098, 700106"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-white focus:outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 transition-colors"
                 />
-                <span className="text-[10px] text-slate-500 block mt-1">
+                <span className="text-xs text-slate-500 dark:text-slate-400 block mt-1">
                   Used by the Pincode Checker tool on the homepage to verify doorstep serviceability.
                 </span>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">Description</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Description</label>
                 <textarea
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Brief description of service coverage and average doorstep arrival time..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4 items-center">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">Sort Order</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Sort Order</label>
                   <input
                     type="number"
                     value={formData.sortOrder}
                     onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value, 10) || 0 })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 transition-colors"
                   />
                 </div>
 
                 <div className="pt-5">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300">
                     <input
                       type="checkbox"
                       checked={formData.isActive}
@@ -433,14 +434,14 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setIsCreatingNew(false);
                     setEditingArea(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="min-h-[38px] px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -448,7 +449,7 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 transition-colors shadow-sm disabled:opacity-50"
+                  className="min-h-[38px] inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-white dark:text-slate-950 transition-colors shadow-sm disabled:opacity-50"
                 >
                   {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                   <span>Save Area</span>
@@ -458,7 +459,6 @@ export default function AreasClient({ initialAreas }: AreasClientProps) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

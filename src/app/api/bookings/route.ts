@@ -9,23 +9,23 @@ const BookingCreateSchema = z.object({
   deviceType: z.string().min(1, 'Please select a device type').max(50),
   brand: z.string().max(100).optional().or(z.literal('')),
   model: z.string().max(100).optional().or(z.literal('')),
-  problem: z.string().min(3, 'Please describe or select the issue').max(2000),
+  problem: z.string().min(2, 'Please describe or select the issue').max(2000),
   serviceSlug: z.string().optional().or(z.literal('')),
   serviceMode: z.enum(['shop_visit', 'home_pickup', 'on_site']).default('shop_visit'),
   preferredDate: z.string().optional().or(z.literal('')),
   preferredSlot: z.string().optional().or(z.literal('')),
   address: z.string().max(1000).optional().or(z.literal('')),
   areaSlug: z.string().optional().or(z.literal('')),
+  notes: z.string().max(1000).optional().or(z.literal('')),
+  smsUpdates: z.boolean().optional(),
+  emailUpdates: z.boolean().optional(),
 });
 
-// Helper to generate a unique readable booking code like PRO-74291
+// Helper to generate a unique readable booking code like PRO-2026-1123
 function generateBookingCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let randomStr = '';
-  for (let i = 0; i < 5; i++) {
-    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return `PRO-${randomStr}`;
+  const year = new Date().getFullYear();
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  return `PRO-${year}-${randomNum}`;
 }
 
 export async function POST(req: Request) {
@@ -54,11 +54,52 @@ export async function POST(req: Request) {
       preferredSlot,
       address,
       areaSlug,
+      notes,
+      smsUpdates,
+      emailUpdates,
     } = result.data;
 
     const cleanMobile = mobile.trim();
     const cleanName = name.trim();
     const cleanEmail = email && email.trim() !== '' ? email.trim() : null;
+
+    // 0. Prevent Duplicate Bookings: Check if identical booking was just submitted within last 45 seconds
+    const recentDuplicate = await prisma.booking.findFirst({
+      where: {
+        customer: {
+          mobile: cleanMobile,
+        },
+        deviceType: deviceType.trim(),
+        problem: problem.trim(),
+        createdAt: {
+          gte: new Date(Date.now() - 45 * 1000),
+        },
+      },
+      include: {
+        service: true,
+      },
+    });
+
+    if (recentDuplicate) {
+      return NextResponse.json({
+        success: true,
+        message: 'Repair booking already confirmed!',
+        booking: {
+          id: recentDuplicate.id,
+          bookingCode: recentDuplicate.bookingCode,
+          deviceType: recentDuplicate.deviceType,
+          brand: recentDuplicate.brand,
+          model: recentDuplicate.model,
+          problem: recentDuplicate.problem,
+          serviceName: recentDuplicate.service.name,
+          serviceMode: recentDuplicate.serviceMode,
+          preferredDate: recentDuplicate.preferredDate,
+          preferredSlot: recentDuplicate.preferredSlot,
+          status: recentDuplicate.status,
+          createdAt: recentDuplicate.createdAt,
+        },
+      });
+    }
 
     // 1. Find or create Customer by mobile
     const customer = await prisma.customer.upsert({
@@ -126,6 +167,10 @@ export async function POST(req: Request) {
       }
     }
 
+    const internalPreferenceNote = `Preferences: SMS updates = ${
+      smsUpdates !== false ? 'Enabled' : 'Disabled'
+    }, Email updates = ${emailUpdates !== false ? 'Enabled' : 'Disabled'}`;
+
     // 5. Create Booking record
     const newBooking = await prisma.booking.create({
       data: {
@@ -141,6 +186,8 @@ export async function POST(req: Request) {
         preferredDate: parsedDate,
         preferredSlot: preferredSlot && preferredSlot.trim() !== '' ? preferredSlot.trim() : null,
         address: address && address.trim() !== '' ? address.trim() : null,
+        publicNote: notes && notes.trim() !== '' ? notes.trim() : null,
+        internalNote: internalPreferenceNote,
         status: 'pending',
         source: 'website',
       },
@@ -156,7 +203,7 @@ export async function POST(req: Request) {
         fromStatus: 'pending',
         toStatus: 'pending',
         changedBy: 'Customer (Online Booking)',
-        note: `Initial diagnostic booking submitted online via problem selector: ${problem.trim()}`,
+        note: `Initial diagnostic booking submitted online: ${problem.trim()} (${deviceType.trim()})`,
       },
     });
 
@@ -167,9 +214,13 @@ export async function POST(req: Request) {
         id: newBooking.id,
         bookingCode: newBooking.bookingCode,
         deviceType: newBooking.deviceType,
+        brand: newBooking.brand,
+        model: newBooking.model,
         problem: newBooking.problem,
         serviceName: service.name,
         serviceMode: newBooking.serviceMode,
+        preferredDate: newBooking.preferredDate,
+        preferredSlot: newBooking.preferredSlot,
         status: newBooking.status,
         createdAt: newBooking.createdAt,
       },

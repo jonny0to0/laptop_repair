@@ -77,7 +77,7 @@ export default function ContactForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Priya Nair"
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
           />
         </div>
 
@@ -92,7 +92,7 @@ export default function ContactForm() {
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
               placeholder="e.g. +91 98765 43210"
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function ContactForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. priya@example.com"
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
             />
           </div>
         </div>
@@ -120,14 +120,14 @@ export default function ContactForm() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Tell us what device model you have and what troubleshooting assistance you need..."
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 px-6 rounded-xl font-bold text-xs bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white flex items-center justify-center gap-2 shadow-md shadow-sky-600/20 transition-all tap-target"
+          className="w-full py-3 px-6 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-500 active:bg-sky-700 disabled:opacity-50 text-white flex items-center justify-center gap-2 shadow-md shadow-sky-600/20 transition-all tap-target cursor-pointer"
         >
           {loading ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

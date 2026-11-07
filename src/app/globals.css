@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --color-primary: #155EEF;
   --color-primary-dark: #1048bc;
@@ -11,6 +13,32 @@
   --color-text: #0F172A;
   --color-text-muted: #64748B;
   --color-border: #E2E8F0;
+
+  /* Admin Dashboard Theme Variables - Light Mode */
+  --admin-page-bg: #f8fafc;
+  --admin-card-bg: #ffffff;
+  --admin-card-inner: #f8fafc;
+  --admin-border: #e2e8f0;
+  --admin-border-subtle: #f1f5f9;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-nav-bg: #ffffff;
+  --admin-input-bg: #ffffff;
+  --admin-input-border: #cbd5e1;
+}
+
+.dark {
+  /* Admin Dashboard Theme Variables - Dark Mode */
+  --admin-page-bg: #020617;
+  --admin-card-bg: #0f172a;
+  --admin-card-inner: #020617;
+  --admin-border: #1e293b;
+  --admin-border-subtle: rgba(30, 41, 59, 0.6);
+  --admin-text-main: #ffffff;
+  --admin-text-muted: #94a3b8;
+  --admin-nav-bg: #0f172a;
+  --admin-input-bg: #0f172a;
+  --admin-input-border: #334155;
 }
 
 @theme inline {
@@ -86,3 +114,22 @@ html {
   width: max-content;
   animation: marqueeBrands 25s linear infinite;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth theme transition for admin interface */
+.admin-theme-wrapper,
+.admin-theme-wrapper *,
+.admin-theme-wrapper *::before,
+.admin-theme-wrapper *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+

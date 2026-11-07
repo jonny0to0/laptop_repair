@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Phone, Calendar, Menu, X, Shield, Wrench, Search } from 'lucide-react';
+import { Phone, Calendar, Menu, X, Shield, Wrench, Search, Lock } from 'lucide-react';
 import BusinessHoursBadge from './BusinessHoursBadge';
 
 interface HeaderProps {
@@ -53,6 +53,14 @@ export default function Header({
             >
               <Search className="w-3 h-3" />
               Track Device Status
+            </Link>
+            <span>•</span>
+            <Link
+              href="/admin/login"
+              className="text-slate-300 hover:text-white flex items-center gap-1 font-medium"
+            >
+              <Lock className="w-3 h-3" />
+              Staff Login
             </Link>
           </div>
         </div>
@@ -173,6 +181,14 @@ export default function Header({
               >
                 <Calendar className="w-4 h-4" />
                 <span>Schedule a Repair Wizard</span>
+              </Link>
+              <Link
+                href="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 text-white font-semibold text-sm shadow-sm tap-target"
+              >
+                <Lock className="w-4 h-4 text-sky-400" />
+                <span>Staff & Admin Portal Login</span>
               </Link>
             </div>
           </div>

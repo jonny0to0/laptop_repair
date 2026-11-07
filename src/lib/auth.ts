@@ -37,9 +37,11 @@ export async function createSession(user: AdminSessionUser): Promise<string> {
     .sign(SECRET_KEY);
 
   const cookieStore = await cookies();
+  const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https://') ?? false;
+
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isHttps,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24, // 24 hours
@@ -68,9 +70,11 @@ export async function getSession(): Promise<AdminSessionUser | null> {
 
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
+  const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https://') ?? false;
+
   cookieStore.set(SESSION_COOKIE_NAME, '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isHttps,
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
